@@ -21,4 +21,7 @@ interface TableModelRepository {
 
     // Find available tables with minimum capacity (optional)
     fun findAvailableTables(minCapacity: Int, callback: (Boolean, String, List<TableModel>?) -> Unit)
+
+    // Book a table (sets isAvailable = false)
+    fun bookTable(tableId: String, callback: (Boolean, String) -> Unit)
 }

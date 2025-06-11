@@ -2,6 +2,7 @@ package com.example.indradev_resto.view
 
 
 
+import BookingScreen
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -51,6 +52,8 @@ fun RestoNavigationBody() {
     val repository = remember { UserRepositoryImpl() }
     val userViewModel = remember { UserViewModel(repository) }
 
+    val tableRepository = remember { TableModelRepositoryImpl() }
+    val tableViewModel = remember { TableViewModel(tableRepository) }
 
     data class BottomNavItem(val label: String, val icon: ImageVector)
     val navItems = listOf(
@@ -110,7 +113,7 @@ fun RestoNavigationBody() {
             when (selectedIndex) {
                 0 -> DashboardScreen()
                 1 -> MenuScreen()
-                2 -> Tables()
+                2 -> BookingScreen(tableViewModel)
                 3 -> ProfileScreen(
                     onEditClick = {
                         selectedIndex = 4 // Navigate to EditProfileScreen
