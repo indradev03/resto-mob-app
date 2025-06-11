@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">indradev_RESTO</string>
+    <string name="title_activity_login_resto">LoginActivityResto</string>
+    <string name="title_activity_dashboard_resto">DashboardActivityResto</string>
+    <string name="title_activity_registration_resto">RegistrationActivityResto</string>
+    <string name="title_activity_splash_resto">SplashActivityResto</string>
+    <string name="title_activity_profile_resto">ProfileActivityResto</string>
+    <string name="title_activity_menu_resto">MenuActivityResto</string>
+</resources>
