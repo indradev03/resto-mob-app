@@ -54,6 +54,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    // ✅ Material Icons Extended
+    implementation("androidx.compose.material:material-icons-extended")
+
     // Firebase
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
@@ -61,6 +64,7 @@ dependencies {
     // 📷 Coil for image loading
     implementation("io.coil-kt:coil-compose:2.2.2")
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.firebase.crashlytics.buildtools)
 
     // ✅ (Optional): Remove duplicate hardcoded activity-compose if using libs. Already declared:
     // implementation("androidx.activity:activity-compose:1.7.2")

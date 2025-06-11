@@ -18,7 +18,7 @@ import com.example.indradev_resto.viewmodel.TableViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TablesScreen(tableViewModel: TableViewModel) {
+fun AdminTablesScreen(tableViewModel: TableViewModel) {
     var loading by remember { mutableStateOf(true) }
     var message by remember { mutableStateOf("") }
     val tables by tableViewModel.tables.observeAsState(emptyList())

@@ -81,6 +81,9 @@ fun RestoLoginBody(innerPadding: PaddingValues)
     val repository = remember { UserRepositoryImpl() }
     val userViewModel = remember { UserViewModel(repository) }
 
+    val adminEmail = "admin@gmail.com"
+    val adminPassword = "admin123"
+
 
     // email
     var  email by remember { mutableStateOf("") }
@@ -233,36 +236,39 @@ fun RestoLoginBody(innerPadding: PaddingValues)
         // 🔘 Login Button
         Button(
             onClick = {
-                userViewModel.login(email, password) { success, message ->
-                    if (success) {
-                        val userId = userViewModel.getCurrentUser()?.uid
+                if (email == adminEmail && password == adminPassword) {
+                    // Direct Admin Access
+                    val intent = Intent(context, AdminDashboardActivityResto::class.java)
+                    context.startActivity(intent)
+                    activity?.finish()
+                } else {
+                    // Regular Firebase Login
+                    userViewModel.login(email, password) { success, message ->
+                        if (success) {
+                            val userId = userViewModel.getCurrentUser()?.uid
+                            if (userId != null) {
+                                userViewModel.getUserFromDatabase(userId) { dbSuccess, dbMessage, userModel ->
+                                    if (dbSuccess && userModel != null) {
+                                        editor.putString("email", email)
+                                        editor.putString("password", password)
+                                        editor.putString("firstName", userModel.firstName)
+                                        editor.apply()
 
-                        if (userId != null) {
-                            userViewModel.getUserFromDatabase(userId) { dbSuccess, dbMessage, userModel ->
-                                if (dbSuccess && userModel != null) {
-                                    // Save email, password, and firstName in SharedPreferences
-                                    editor.putString("email", email)
-                                    editor.putString("password", password)
-                                    editor.putString("firstName", userModel.firstName) // ✅ save first name
-                                    editor.apply()
-
-                                    // Navigate to Dashboard
-                                    val intent = Intent(context, DashboardActivityResto::class.java)
-                                    context.startActivity(intent)
-                                    activity?.finish()
-                                } else {
-                                    Toast.makeText(context, "Failed to fetch user info", Toast.LENGTH_SHORT).show()
+                                        val intent = Intent(context, DashboardActivityResto::class.java)
+                                        context.startActivity(intent)
+                                        activity?.finish()
+                                    } else {
+                                        Toast.makeText(context, "Failed to fetch user info", Toast.LENGTH_SHORT).show()
+                                    }
                                 }
+                            } else {
+                                Toast.makeText(context, "Login user ID not found", Toast.LENGTH_SHORT).show()
                             }
                         } else {
-                            Toast.makeText(context, "Login user ID not found", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                         }
-                    } else {
-                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                     }
                 }
-
-
             },
             modifier = Modifier
                 .fillMaxWidth()

@@ -1,7 +1,7 @@
 package com.example.indradev_resto.view
 
 
-import TablesScreen
+
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -33,6 +33,7 @@ import com.example.indradev_resto.repository.UserRepositoryImpl
 import com.example.indradev_resto.view.pages.*
 import com.example.indradev_resto.viewmodel.TableViewModel
 import com.example.indradev_resto.viewmodel.UserViewModel
+import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.Tables
 
 class DashboardActivityResto : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,8 +51,6 @@ fun RestoNavigationBody() {
     val repository = remember { UserRepositoryImpl() }
     val userViewModel = remember { UserViewModel(repository) }
 
-    val tablerepository = TableModelRepositoryImpl()
-    val tableViewModel = TableViewModel(tablerepository)
 
     data class BottomNavItem(val label: String, val icon: ImageVector)
     val navItems = listOf(
@@ -111,7 +110,7 @@ fun RestoNavigationBody() {
             when (selectedIndex) {
                 0 -> DashboardScreen()
                 1 -> MenuScreen()
-                2 -> TablesScreen( tableViewModel)
+                2 -> Tables()
                 3 -> ProfileScreen(
                     onEditClick = {
                         selectedIndex = 4 // Navigate to EditProfileScreen
