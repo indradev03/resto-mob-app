@@ -65,6 +65,8 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.2.2")
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.androidx.room.common.jvm)
+    implementation(libs.firebase.firestore.ktx)
 
     // ✅ (Optional): Remove duplicate hardcoded activity-compose if using libs. Already declared:
     // implementation("androidx.activity:activity-compose:1.7.2")

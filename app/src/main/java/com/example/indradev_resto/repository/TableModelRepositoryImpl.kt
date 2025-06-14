@@ -119,14 +119,14 @@ class TableModelRepositoryImpl : TableModelRepository {
             })
     }
 
+    /**
+     * Marks a table as unavailable (booked).
+     * This method updates the 'isAvailable' property of the table to false.
+     */
     override fun bookTable(tableId: String, callback: (Boolean, String) -> Unit) {
-        // Step 1: Get the table
         getTableById(tableId) { success, msg, table ->
             if (success && table != null) {
-                // Step 2: Update isAvailable to false (i.e., booked)
                 val updatedTable = table.copy(isAvailable = false)
-
-                // Step 3: Save it back
                 updateTable(updatedTable) { updateSuccess, updateMsg ->
                     if (updateSuccess) {
                         callback(true, "Table booked successfully")
@@ -139,7 +139,4 @@ class TableModelRepositoryImpl : TableModelRepository {
             }
         }
     }
-
-
-
 }

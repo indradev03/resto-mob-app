@@ -71,6 +71,11 @@ class TableViewModel(private val repository: TableModelRepository) : ViewModel()
         }
     }
 
+    fun markTableUnavailable(tableId: String, callback: (Boolean, String) -> Unit) {
+        repository.bookTable(tableId, callback)
+    }
+
+
 
     fun bookTable(table: TableModel, callback: (Boolean, String) -> Unit) {
         repository.bookTable(table.tableId) { success, msg ->
@@ -82,4 +87,5 @@ class TableViewModel(private val repository: TableModelRepository) : ViewModel()
             callback(success, msg)
         }
     }
+
 }

@@ -1,0 +1,48 @@
+// BookingModelRepoImpl.kt
+package com.example.indradev_resto.repository
+
+import com.example.indradev_resto.model.BookingModel
+import com.google.firebase.database.*
+
+import java.util.*
+
+class BookingModelRepoImpl : BookingModelRepo {
+
+    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val ref: DatabaseReference = database.reference.child("bookings")
+
+    override fun insertBooking(
+        booking: BookingModel,
+        onResult: (Boolean, String) -> Unit
+    ) {
+        val bookingId = UUID.randomUUID().toString()
+        val newBooking = booking.copy(bookingId = bookingId)
+
+        ref.child(bookingId).setValue(newBooking)
+            .addOnSuccessListener {
+                onResult(true, "Booking successful.")
+            }
+            .addOnFailureListener { e ->
+                onResult(false, "Failed: ${e.localizedMessage}")
+            }
+    }
+
+    override fun getAllBookings(
+        onResult: (Boolean, String, List<BookingModel>) -> Unit
+    ) {
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val bookingList = mutableListOf<BookingModel>()
+                for (child in snapshot.children) {
+                    val booking = child.getValue(BookingModel::class.java)
+                    booking?.let { bookingList.add(it) }
+                }
+                onResult(true, "Bookings fetched successfully.", bookingList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                onResult(false, "Error: ${error.message}", emptyList())
+            }
+        })
+    }
+}
