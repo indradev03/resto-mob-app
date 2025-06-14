@@ -14,10 +14,10 @@
       <SelectionState runConfigName="SplashActivityResto">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SplashActivityResto (3)">
+      <SelectionState runConfigName="SplashActivityResto (4)">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SplashActivityResto (4)">
+      <SelectionState runConfigName="DashboardActivityResto">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

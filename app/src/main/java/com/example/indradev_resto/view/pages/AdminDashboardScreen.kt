@@ -16,6 +16,7 @@ import com.example.indradev_resto.view.pages.components.AdminBottomNavItem
 import com.example.indradev_resto.viewmodel.TableViewModel
 
 
+@SuppressLint("ViewModelConstructorInComposable")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminDashboardScreen(onLogout: () -> Unit = {}) {
