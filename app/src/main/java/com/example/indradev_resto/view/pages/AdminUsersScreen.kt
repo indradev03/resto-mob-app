@@ -11,6 +11,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.indradev_resto.model.UserModel
@@ -53,6 +54,7 @@ fun AdminUsersScreen() {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
+
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),

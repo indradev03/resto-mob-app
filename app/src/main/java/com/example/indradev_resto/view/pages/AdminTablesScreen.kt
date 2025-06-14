@@ -130,8 +130,8 @@ fun TableItem(
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.White), // Set background to white
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp) // Increase elevation for shadow
     ) {
         Row(
             modifier = Modifier
@@ -194,6 +194,7 @@ fun TableItem(
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

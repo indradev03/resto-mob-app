@@ -1,7 +1,5 @@
 package com.example.indradev_resto.view
 
-
-
 import BookingScreen
 import android.content.Context
 import android.content.Intent
@@ -32,6 +30,7 @@ import com.example.indradev_resto.R
 import com.example.indradev_resto.repository.BookingModelRepoImpl
 import com.example.indradev_resto.repository.TableModelRepositoryImpl
 import com.example.indradev_resto.repository.UserRepositoryImpl
+import com.example.indradev_resto.ui.theme.IndradevRestoTheme
 import com.example.indradev_resto.view.pages.*
 import com.example.indradev_resto.viewmodel.BookingViewModel
 import com.example.indradev_resto.viewmodel.TableViewModel
@@ -42,10 +41,14 @@ class DashboardActivityResto : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            RestoNavigationBody()
+            IndradevRestoTheme {
+                RestoNavigationBody()
+            }
         }
     }
 }
+
+data class BottomNavItem(val label: String, val icon: ImageVector)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,86 +59,125 @@ fun RestoNavigationBody() {
     val tableRepository = remember { TableModelRepositoryImpl() }
     val tableViewModel = remember { TableViewModel(tableRepository) }
 
-    val BookingRepository = remember { BookingModelRepoImpl() }
-    val BookingViewModel = remember { BookingViewModel(BookingRepository) }
+    val bookingRepository = remember { BookingModelRepoImpl() }
+    val bookingViewModel = remember { BookingViewModel(bookingRepository) }
 
-    data class BottomNavItem(val label: String, val icon: ImageVector)
     val navItems = listOf(
         BottomNavItem("Dashboard", Icons.Default.Home),
-        BottomNavItem("Our Menu", Icons.Default.List),
-        BottomNavItem("Tables", Icons.Default.Star),
+        BottomNavItem("Our Menu", Icons.Default.RestaurantMenu),
+        BottomNavItem("Tables", Icons.Default.TableRestaurant),
         BottomNavItem("Profile", Icons.Default.Person)
     )
 
-    val context = LocalContext.current
     var selectedIndex by remember { mutableStateOf(0) }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = { TopNavigationBar { selectedIndex = it } },
         bottomBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color.White)
-            ) {
-                NavigationBar(
-                    containerColor = Color.White
-                ) {
-                    navItems.forEachIndexed { index, item ->
-                        NavigationBarItem(
-                            selected = selectedIndex == index,
-                            onClick = { selectedIndex = index },
-                            icon = {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(
-                                        imageVector = item.icon,
-                                        contentDescription = item.label,
-                                        modifier = Modifier.size(34.dp)
-                                    )
-                                    Spacer(modifier = Modifier.height(6.dp))
-                                    Text(
-                                        text = item.label,
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                }
-                            },
-                            alwaysShowLabel = false
-                        )
-                    }
-                }
-            }
+            RestoBottomNavigationBar(
+                selectedIndex = selectedIndex,
+                onItemSelected = { selectedIndex = it }
+            )
         }
     ) { innerPadding ->
-        Box(
+
+        // Wrap content inside Surface with elevation for shadow
+        Surface(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize()
-                .background(color = Color.White)
+                .fillMaxSize(),
+            shadowElevation = 8.dp, // add shadow / elevation
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp), // optional rounded corners for better look
+            color = Color.White
         ) {
-            when (selectedIndex) {
-                0 -> DashboardScreen()
-                1 -> MenuScreen()
-                2 -> BookingScreen(
-                    tableViewModel,
-                    BookingViewModel
-                )
-                3 -> ProfileScreen(
-                    onEditClick = {
-                        selectedIndex = 4 // Navigate to EditProfileScreen
-                    }
-                )
-                4 -> EditProfileScreen(
-                    userViewModel = userViewModel,
-                    onBack = {
-                        selectedIndex = 3 // Back to ProfileScreen
-                    }
-                )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp) // optional padding inside shadow container
+            ) {
+                when (selectedIndex) {
+                    0 -> DashboardScreen()
+                    1 -> MenuScreen()
+                    2 -> BookingScreen(tableViewModel, bookingViewModel)
+                    3 -> ProfileScreen(
+                        onEditClick = {
+                            selectedIndex = 4 // Navigate to EditProfileScreen
+                        }
+                    )
+                    4 -> EditProfileScreen(
+                        userViewModel = userViewModel,
+                        onBack = {
+                            selectedIndex = 3 // Back to ProfileScreen
+                        }
+                    )
+                }
             }
         }
     }
 }
+
+
+@Composable
+fun RestoBottomNavigationBar(
+    selectedIndex: Int,
+    onItemSelected: (Int) -> Unit
+) {
+    val navItems = listOf(
+        BottomNavItem("Dashboard", Icons.Default.Home),
+        BottomNavItem("Our Menu", Icons.Default.RestaurantMenu),
+        BottomNavItem("Tables", Icons.Default.TableRestaurant),
+        BottomNavItem("Profile", Icons.Default.Person)
+    )
+
+    NavigationBar(
+        containerColor = Color.White,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+    ) {
+        navItems.forEachIndexed { index, item ->
+            val isSelected = selectedIndex == index
+            NavigationBarItem(
+                selected = isSelected,
+                onClick = { onItemSelected(index) },
+                icon = {
+                    Box(
+                        modifier = Modifier
+                            // Removed background hover effect here
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = item.icon,
+                                contentDescription = item.label,
+                                tint = if (isSelected) MaterialTheme.colorScheme.primary else Color.Black,
+                                modifier = Modifier.size(30.dp)
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = item.label,
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+
+                    }
+                },
+                alwaysShowLabel = false,
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = Color.Black,
+                    // You can also remove the indicatorColor to remove any background indicator on selection:
+                    indicatorColor = Color.Transparent
+                )
+            )
+        }
+    }
+}
+
+
+
+
 
 @Composable
 fun TopNavigationBar(onNavigateTo: (Int) -> Unit) {
@@ -238,7 +280,7 @@ fun ImageButton(
     modifier: Modifier = Modifier,
     backgroundColor: Color = Color.White,
     cornerRadius: Dp = 12.dp,
-    iconSize: Dp = 25.dp,
+    iconSize: Dp = 30.dp,
     onClick: () -> Unit
 ) {
     Box(
@@ -257,5 +299,7 @@ fun ImageButton(
 @Preview(showBackground = true)
 @Composable
 fun PreviewDashboard() {
-    RestoNavigationBody()
+    IndradevRestoTheme {
+        RestoNavigationBody()
+    }
 }

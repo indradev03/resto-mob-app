@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -73,175 +74,190 @@ fun EditProfileScreen(
         return
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(14.dp),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        contentPadding = PaddingValues(bottom = 24.dp)
     ) {
-        Text("Edit Profile", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(20.dp))
+        item {
+            Text("Edit Profile", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(20.dp))
+        }
 
-        OutlinedTextField(
-            value = firstName,
-            onValueChange = { firstName = it },
-            label = { Text("First Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
+        item {
+            OutlinedTextField(
+                value = firstName,
+                onValueChange = { firstName = it },
+                label = { Text("First Name") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        item {
+            OutlinedTextField(
+                value = lastName,
+                onValueChange = { lastName = it },
+                label = { Text("Last Name") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
-        OutlinedTextField(
-            value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text("Last Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
+        item {
+            OutlinedTextField(
+                value = email,
+                onValueChange = {},
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                enabled = false
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        item {
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    val iconRes = if (passwordVisible)
+                        R.drawable.baseline_visibility_24
+                    else
+                        R.drawable.baseline_visibility_off_24
+                    val description = if (passwordVisible) "Hide password" else "Show password"
 
-        OutlinedTextField(
-            value = email,
-            onValueChange = {},
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
-            readOnly = true,
-            enabled = false
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                val iconRes = if (passwordVisible)
-                    R.drawable.baseline_visibility_24
-                else
-                    R.drawable.baseline_visibility_off_24
-                val description = if (passwordVisible) "Hide password" else "Show password"
-
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(painter = painterResource(id = iconRes), contentDescription = description)
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(painter = painterResource(id = iconRes), contentDescription = description)
+                    }
                 }
-            }
-        )
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        item {
+            OutlinedTextField(
+                value = gender,
+                onValueChange = {},
+                label = { Text("Gender") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                enabled = false
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
-        OutlinedTextField(
-            value = gender,
-            onValueChange = {},
-            label = { Text("Gender") },
-            modifier = Modifier.fillMaxWidth(),
-            readOnly = true,
-            enabled = false
-        )
+        item {
+            OutlinedTextField(
+                value = dob,
+                onValueChange = {},
+                label = { Text("Date of Birth") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                enabled = false
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        item {
+            OutlinedTextField(
+                value = country,
+                onValueChange = {},
+                label = { Text("Country") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                enabled = false
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+        }
 
-        OutlinedTextField(
-            value = dob,
-            onValueChange = {},
-            label = { Text("Date of Birth") },
-            modifier = Modifier.fillMaxWidth(),
-            readOnly = true,
-            enabled = false
-        )
+        item {
+            Button(
+                onClick = {
+                    // your existing save logic here
+                    if (userId != null) {
+                        val updatedData = mutableMapOf<String, Any?>(
+                            "firstName" to firstName,
+                            "lastName" to lastName,
+                            "password" to password
+                        )
 
-        Spacer(modifier = Modifier.height(12.dp))
+                        val oldPassword = userModel?.password ?: ""
+                        val passwordChanged = password != oldPassword
+                        val currentUser = FirebaseAuth.getInstance().currentUser
 
-        OutlinedTextField(
-            value = country,
-            onValueChange = {},
-            label = { Text("Country") },
-            modifier = Modifier.fillMaxWidth(),
-            readOnly = true,
-            enabled = false
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                if (userId != null) {
-                    val updatedData = mutableMapOf<String, Any?>(
-                        "firstName" to firstName,
-                        "lastName" to lastName,
-                        "password" to password
-                    )
-
-                    val oldPassword = userModel?.password ?: ""
-                    val passwordChanged = password != oldPassword
-                    val currentUser = FirebaseAuth.getInstance().currentUser
-
-                    fun updateFirestore() {
-                        userViewModel.editProfile(userId, updatedData) { success, message, requiresLogin ->
-                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                            if (success) {
-                                if (passwordChanged || requiresLogin) {
-                                    val intent = Intent(context, LoginActivityResto::class.java)
-                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                    context.startActivity(intent)
-                                    activity?.finish()
-                                } else {
-                                    activity?.finish()
+                        fun updateFirestore() {
+                            userViewModel.editProfile(userId, updatedData) { success, message, requiresLogin ->
+                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                if (success) {
+                                    if (passwordChanged || requiresLogin) {
+                                        val intent = Intent(context, LoginActivityResto::class.java)
+                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                        context.startActivity(intent)
+                                        activity?.finish()
+                                    } else {
+                                        activity?.finish()
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    if (passwordChanged && currentUser != null) {
-                        currentUser.updatePassword(password)
-                            .addOnSuccessListener {
-                                updateFirestore()
-                            }
-                            .addOnFailureListener { exception ->
-                                if (exception is com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException) {
-                                    val emailAddress = currentUser.email
-                                    if (!emailAddress.isNullOrEmpty()) {
-                                        val credential = EmailAuthProvider.getCredential(emailAddress, oldPassword)
-                                        currentUser.reauthenticate(credential)
-                                            .addOnSuccessListener {
-                                                currentUser.updatePassword(password)
-                                                    .addOnSuccessListener { updateFirestore() }
-                                                    .addOnFailureListener {
-                                                        Toast.makeText(context, "Password update failed after re-authentication", Toast.LENGTH_SHORT).show()
-                                                    }
-                                            }
-                                            .addOnFailureListener {
-                                                Toast.makeText(context, "Re-authentication failed. Please log in again.", Toast.LENGTH_SHORT).show()
-                                                val intent = Intent(context, LoginActivityResto::class.java)
-                                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                context.startActivity(intent)
-                                                activity?.finish()
-                                            }
-                                    }
-                                } else {
-                                    Toast.makeText(context, "Failed to update password: ${exception.message}", Toast.LENGTH_SHORT).show()
+                        if (passwordChanged && currentUser != null) {
+                            currentUser.updatePassword(password)
+                                .addOnSuccessListener {
+                                    updateFirestore()
                                 }
-                            }
-                    } else {
-                        updateFirestore()
+                                .addOnFailureListener { exception ->
+                                    if (exception is com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException) {
+                                        val emailAddress = currentUser.email
+                                        if (!emailAddress.isNullOrEmpty()) {
+                                            val credential = EmailAuthProvider.getCredential(emailAddress, oldPassword)
+                                            currentUser.reauthenticate(credential)
+                                                .addOnSuccessListener {
+                                                    currentUser.updatePassword(password)
+                                                        .addOnSuccessListener { updateFirestore() }
+                                                        .addOnFailureListener {
+                                                            Toast.makeText(context, "Password update failed after re-authentication", Toast.LENGTH_SHORT).show()
+                                                        }
+                                                }
+                                                .addOnFailureListener {
+                                                    Toast.makeText(context, "Re-authentication failed. Please log in again.", Toast.LENGTH_SHORT).show()
+                                                    val intent = Intent(context, LoginActivityResto::class.java)
+                                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                    context.startActivity(intent)
+                                                    activity?.finish()
+                                                }
+                                        }
+                                    } else {
+                                        Toast.makeText(context, "Failed to update password: ${exception.message}", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                        } else {
+                            updateFirestore()
+                        }
                     }
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Save")
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Save")
+            }
+            Spacer(modifier = Modifier.height(12.dp))
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedButton(
-            onClick = { onBack() },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Cancel")
+        item {
+            OutlinedButton(
+                onClick = { onBack() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Cancel")
+            }
         }
     }
 }
+
