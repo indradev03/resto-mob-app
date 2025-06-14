@@ -1,5 +1,6 @@
 package com.example.indradev_resto.view.pages
 
+import AdminOrdersScreen
 import AdminTablesScreen
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*

@@ -12,4 +12,8 @@ interface BookingModelRepo{
     fun getAllBookings(
         onResult: (Boolean, String, List<BookingModel>) -> Unit
     )
+
+    fun deleteBooking(bookingId: String, onResult: (Boolean, String) -> Unit)
+
+
 }

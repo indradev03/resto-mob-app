@@ -51,4 +51,17 @@ class BookingViewModel(
         }
     }
 
+    fun deleteBooking(order: OrderModel) {
+        _isLoading.value = true
+        repository.deleteBooking(order.orderId) { success, msg ->
+            _message.value = msg
+            if (success) {
+                getAllBookings()
+            } else {
+                _isLoading.value = false
+            }
+        }
+    }
+
+
 }

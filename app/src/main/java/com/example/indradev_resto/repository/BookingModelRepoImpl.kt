@@ -2,6 +2,7 @@
 package com.example.indradev_resto.repository
 
 import com.example.indradev_resto.model.BookingModel
+import com.example.indradev_resto.model.OrderModel
 import com.google.firebase.database.*
 
 import java.util.*
@@ -45,4 +46,18 @@ class BookingModelRepoImpl : BookingModelRepo {
             }
         })
     }
+    override fun deleteBooking(
+        bookingId: String,
+        onResult: (Boolean, String) -> Unit
+    ) {
+        ref.child(bookingId).removeValue()
+            .addOnSuccessListener {
+                onResult(true, "Booking deleted successfully.")
+            }
+            .addOnFailureListener { e ->
+                onResult(false, "Failed to delete booking: ${e.localizedMessage}")
+            }
+    }
+
+
 }
