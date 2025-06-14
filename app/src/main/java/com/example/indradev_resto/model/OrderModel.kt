@@ -1,9 +1,9 @@
 package com.example.indradev_resto.model
 
 data class OrderModel(
-    val orderId: String = "",            // Unique ID for order
-    val table: TableModel = TableModel(), // Full table info
-    val userId: String = "",    // Full user info
-    val bookingTimestamp: Long = 0L        // When booked (optional)
+    val orderId: String,        // bookingId
+    val customerName: String,
+    val contactNumber: String,
+    val tableNumber: Int,
+    val bookingDate: String
 )
-// foreign key maa id matra pass hanne ho
