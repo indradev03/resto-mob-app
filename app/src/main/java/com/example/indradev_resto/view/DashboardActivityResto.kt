@@ -29,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.indradev_resto.R
-import com.example.indradev_resto.model.BookingModel
 import com.example.indradev_resto.repository.BookingModelRepoImpl
 import com.example.indradev_resto.repository.TableModelRepositoryImpl
 import com.example.indradev_resto.repository.UserRepositoryImpl
@@ -37,7 +36,6 @@ import com.example.indradev_resto.view.pages.*
 import com.example.indradev_resto.viewmodel.BookingViewModel
 import com.example.indradev_resto.viewmodel.TableViewModel
 import com.example.indradev_resto.viewmodel.UserViewModel
-import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.Tables
 
 class DashboardActivityResto : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

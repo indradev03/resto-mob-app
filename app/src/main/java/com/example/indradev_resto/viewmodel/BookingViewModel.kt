@@ -1,4 +1,3 @@
-// BookingViewModel.kt
 package com.example.indradev_resto.viewmodel
 
 import androidx.lifecycle.LiveData
@@ -6,12 +5,20 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.indradev_resto.model.BookingModel
 import com.example.indradev_resto.model.OrderModel
-import com.example.indradev_resto.repository.BookingModelRepo
+import com.example.indradev_resto.repository.BookingModelRepoImpl
 
-class BookingViewModel(private val repository: BookingModelRepo) : ViewModel() {
+class BookingViewModel(
+    private val repository: BookingModelRepoImpl = BookingModelRepoImpl()) : ViewModel() {
+
 
     private val _message = MutableLiveData("")
     val message: LiveData<String> = _message
+
+    private val _orders = MutableLiveData<List<OrderModel>>(emptyList())
+    val orders: LiveData<List<OrderModel>> = _orders
+
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
 
     private val _bookings = MutableLiveData<List<BookingModel>>()
     val bookings: LiveData<List<BookingModel>> = _bookings
@@ -22,17 +29,13 @@ class BookingViewModel(private val repository: BookingModelRepo) : ViewModel() {
             onComplete(success, msg)
         }
     }
-
-    private val _orders = MutableLiveData<List<OrderModel>>()
-    val orders: LiveData<List<OrderModel>> = _orders
-
+    
     fun getAllBookings() {
+        _isLoading.value = true
         repository.getAllBookings { success, msg, list ->
             _message.value = msg
             if (success) {
-                _bookings.value = list
-                // Convert to OrderModel
-                val orderList = list.map {
+                _orders.value = list.map {
                     OrderModel(
                         orderId = it.bookingId,
                         customerName = it.customerName,
@@ -41,8 +44,11 @@ class BookingViewModel(private val repository: BookingModelRepo) : ViewModel() {
                         bookingDate = it.bookingDate
                     )
                 }
-                _orders.value = orderList
+            } else {
+                _orders.value = emptyList()
             }
+            _isLoading.value = false
         }
     }
+
 }

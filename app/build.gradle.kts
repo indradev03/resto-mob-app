@@ -57,6 +57,9 @@ dependencies {
     // ✅ Material Icons Extended
     implementation("androidx.compose.material:material-icons-extended")
 
+
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+
     // Firebase
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
