@@ -58,8 +58,13 @@ fun AdminOrdersScreen() {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("📋 All Bookings") })
-        }
+            TopAppBar(
+                title = { Text("📋 All Bookings") },
+                modifier = Modifier.padding(top = 0.dp)
+            )
+        },
+        // Disable system window insets padding to remove extra top space
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { padding ->
         Box(
             modifier = Modifier
