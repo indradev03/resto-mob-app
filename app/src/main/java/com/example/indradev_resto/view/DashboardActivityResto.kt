@@ -1,6 +1,7 @@
 package com.example.indradev_resto.view
 
 import BookingScreen
+import HelpScreen
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -26,6 +27,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.RestaurantMenu
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.Icon
 import com.example.indradev_resto.R
 import com.example.indradev_resto.repository.BookingModelRepoImpl
 import com.example.indradev_resto.repository.TableModelRepositoryImpl
@@ -111,6 +117,7 @@ fun RestoNavigationBody() {
                             selectedIndex = 3 // Back to ProfileScreen
                         }
                     )
+                    5 -> HelpScreen(onBack = { selectedIndex = 0 }) // or whatever your back navigation is
                 }
             }
         }
@@ -226,16 +233,32 @@ fun TopNavigationBar(onNavigateTo: (Int) -> Unit) {
                     onClick = {
                         showMenu = false
                         onNavigateTo(1)
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.RestaurantMenu,
+                            contentDescription = "Menu",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
                 )
-                DropdownMenuItem(
-                    text = { Text("Settings") },
-                    onClick = { showMenu = false }
-                )
+
                 DropdownMenuItem(
                     text = { Text("Help") },
-                    onClick = { showMenu = false }
+                    onClick = {
+                        showMenu = false
+                        onNavigateTo(5)  // Replace with your actual index or navigation logic
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Help,
+                            contentDescription = "Help",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 )
+
+
                 DropdownMenuItem(
                     text = { Text("Logout") },
                     onClick = {
@@ -247,10 +270,18 @@ fun TopNavigationBar(onNavigateTo: (Int) -> Unit) {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         }
                         context.startActivity(intent)
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Logout,
+                            contentDescription = "Logout",
+                            tint = Color.Red
+                        )
                     }
                 )
             }
         }
+
     }
 }
 
