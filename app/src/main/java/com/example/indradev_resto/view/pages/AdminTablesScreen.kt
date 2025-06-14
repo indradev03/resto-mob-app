@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.LayoutDirection
 import com.example.indradev_resto.model.TableModel
 import com.example.indradev_resto.viewmodel.TableViewModel
 
@@ -47,22 +48,31 @@ fun AdminTablesScreen(tableViewModel: TableViewModel) {
             }
         }
     ) { paddingValues ->
+
+        // Remove only the bottom padding:
+        val safePadding = PaddingValues(
+            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+            top = 0.dp,
+            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+            bottom = 0.dp
+        )
+
         Column(
             modifier = Modifier
-                .padding(paddingValues)
-                .padding(16.dp)
+                .padding(safePadding)
+                .padding(12.dp)
                 .fillMaxSize()
         ) {
             Text("🪑 Manage Tables", fontSize = 24.sp, style = MaterialTheme.typography.headlineSmall)
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(20.dp))
 
             if (loading) {
                 CircularProgressIndicator()
             } else if (tables.isEmpty()) {
                 Text("No tables available. $message")
             } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     items(tables) { table ->
                         TableItem(
                             table = table,
@@ -107,6 +117,8 @@ fun AdminTablesScreen(tableViewModel: TableViewModel) {
     }
 }
 
+// TableItem and TableDialog remain unchanged
+
 @Composable
 fun TableItem(
     table: TableModel,
@@ -124,7 +136,7 @@ fun TableItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(18.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -182,7 +194,6 @@ fun TableItem(
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -309,4 +320,3 @@ fun TableDialog(
         shape = RoundedCornerShape(16.dp)
     )
 }
-
