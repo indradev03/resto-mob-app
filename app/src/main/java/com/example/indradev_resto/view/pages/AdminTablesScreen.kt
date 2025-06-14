@@ -1,8 +1,12 @@
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
@@ -24,9 +28,8 @@ fun AdminTablesScreen(tableViewModel: TableViewModel) {
     val tables by tableViewModel.tables.observeAsState(emptyList())
 
     var showDialog by remember { mutableStateOf(false) }
-    var dialogTable by remember { mutableStateOf<TableModel?>(null) } // null = add new
+    var dialogTable by remember { mutableStateOf<TableModel?>(null) }
 
-    // Load tables on enter
     LaunchedEffect(Unit) {
         tableViewModel.getAllTables { success, msg, _ ->
             loading = !success
@@ -37,7 +40,7 @@ fun AdminTablesScreen(tableViewModel: TableViewModel) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                dialogTable = null // Add new
+                dialogTable = null
                 showDialog = true
             }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Table")
@@ -50,17 +53,17 @@ fun AdminTablesScreen(tableViewModel: TableViewModel) {
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
-            Text("List of tables", fontSize = 24.sp)
+            Text("🪑 Manage Tables", fontSize = 24.sp, style = MaterialTheme.typography.headlineSmall)
 
             Spacer(Modifier.height(16.dp))
 
             if (loading) {
-                Text("Loading tables...")
-            } else if (tables!!.isEmpty()) {
+                CircularProgressIndicator()
+            } else if (tables.isEmpty()) {
                 Text("No tables available. $message")
             } else {
-                LazyColumn {
-                    items(tables!!) { table ->
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(tables) { table ->
                         TableItem(
                             table = table,
                             onEdit = {
@@ -76,7 +79,6 @@ fun AdminTablesScreen(tableViewModel: TableViewModel) {
                                 }
                             }
                         )
-                        Divider()
                     }
                 }
             }
@@ -87,23 +89,16 @@ fun AdminTablesScreen(tableViewModel: TableViewModel) {
                 initialTable = dialogTable,
                 onDismiss = { showDialog = false },
                 onSave = { table ->
-                    if (dialogTable == null) {
-                        // Adding new table
-                        tableViewModel.addTable(table) { success, msg ->
-                            message = msg
-                            if (success) {
-                                tableViewModel.getAllTables { _, _, _ -> }
-                                showDialog = false
-                            }
-                        }
-                    } else {
-                        // Updating existing table
-                        tableViewModel.updateTable(table) { success, msg ->
-                            message = msg
-                            if (success) {
-                                tableViewModel.getAllTables { _, _, _ -> }
-                                showDialog = false
-                            }
+                    val operation = if (dialogTable == null)
+                        tableViewModel::addTable
+                    else
+                        tableViewModel::updateTable
+
+                    operation(table) { success, msg ->
+                        message = msg
+                        if (success) {
+                            tableViewModel.getAllTables { _, _, _ -> }
+                            showDialog = false
                         }
                     }
                 }
@@ -118,33 +113,76 @@ fun TableItem(
     onEdit: (TableModel) -> Unit,
     onDelete: (TableModel) -> Unit
 ) {
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(vertical = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column {
-            Text("Table #${table.tableNumber}", fontSize = 18.sp, color = Color.Black)
-            Text("Capacity: ${table.capacity}", fontSize = 14.sp, color = Color.Gray)
-            Text(
-                "Available: ${if (table.isAvailable) "Yes" else "No"}",
-                fontSize = 14.sp,
-                color = if (table.isAvailable) Color(0xFF4CAF50) else Color.Red
-            )
-        }
-
-        Row {
-            IconButton(onClick = { onEdit(table) }) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit Table")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "Table #${table.tableNumber}",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Capacity: ${table.capacity}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "Available: ${if (table.isAvailable) "Yes" else "No"}",
+                    color = if (table.isAvailable) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                if (table.location.isNotBlank()) {
+                    Text(
+                        text = "Location: ${table.location}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
-            IconButton(onClick = { onDelete(table) }) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete Table", tint = Color.Red)
+
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                IconButton(
+                    onClick = { onEdit(table) },
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Table",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                IconButton(
+                    onClick = { onDelete(table) },
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Table",
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -159,68 +197,27 @@ fun TableDialog(
     var location by remember { mutableStateOf(initialTable?.location ?: "") }
     var isAvailable by remember { mutableStateOf(initialTable?.isAvailable ?: true) }
 
+    var showErrors by remember { mutableStateOf(false) }
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = {
-            Text(text = if (initialTable == null) "Add New Table" else "Edit Table")
-        },
-        text = {
-            Column {
-                if (initialTable == null) {
-                    OutlinedTextField(
-                        value = tableId,
-                        onValueChange = { tableId = it },
-                        label = { Text("Table ID (unique)") },
-                        singleLine = true,
-                        isError = tableId.isBlank()
-                    )
-                } else {
-                    Text("Table ID: $tableId", modifier = Modifier.padding(bottom = 8.dp))
-                }
-
-                OutlinedTextField(
-                    value = tableNumber,
-                    onValueChange = { tableNumber = it.filter { ch -> ch.isDigit() } },
-                    label = { Text("Table Number") },
-                    singleLine = true,
-                )
-                OutlinedTextField(
-                    value = capacity,
-                    onValueChange = { capacity = it.filter { ch -> ch.isDigit() } },
-                    label = { Text("Capacity") },
-                    singleLine = true,
-                )
-                OutlinedTextField(
-                    value = location,
-                    onValueChange = { location = it },
-                    label = { Text("Location") },
-                    singleLine = true
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = isAvailable,
-                        onCheckedChange = { isAvailable = it }
-                    )
-                    Text("Available")
-                }
-            }
-        },
         confirmButton = {
             TextButton(
                 onClick = {
-                    // Validate inputs
-                    if ((initialTable != null || tableId.isNotBlank())
-                        && tableNumber.isNotBlank()
-                        && capacity.isNotBlank()
+                    showErrors = true
+                    if ((initialTable != null || tableId.isNotBlank()) &&
+                        tableNumber.isNotBlank() &&
+                        capacity.isNotBlank()
                     ) {
-                        val tableModel = TableModel(
-                            tableId = if (initialTable == null) tableId else initialTable.tableId,
-                            tableNumber = tableNumber.toInt(),
-                            capacity = capacity.toInt(),
-                            location = location,
-                            isAvailable = isAvailable
+                        onSave(
+                            TableModel(
+                                tableId = if (initialTable == null) tableId else initialTable.tableId,
+                                tableNumber = tableNumber.toInt(),
+                                capacity = capacity.toInt(),
+                                location = location,
+                                isAvailable = isAvailable
+                            )
                         )
-                        onSave(tableModel)
                     }
                 }
             ) {
@@ -231,6 +228,85 @@ fun TableDialog(
             TextButton(onClick = onDismiss) {
                 Text("Cancel")
             }
-        }
+        },
+        title = {
+            Text(
+                text = if (initialTable == null) "Add New Table" else "Edit Table",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                if (initialTable == null) {
+                    OutlinedTextField(
+                        value = tableId,
+                        onValueChange = { tableId = it },
+                        label = { Text("Table ID (unique)") },
+                        singleLine = true,
+                        isError = showErrors && tableId.isBlank(),
+                        supportingText = {
+                            if (showErrors && tableId.isBlank())
+                                Text("Table ID is required", color = MaterialTheme.colorScheme.error)
+                        }
+                    )
+                } else {
+                    Text("Table ID: $tableId", style = MaterialTheme.typography.bodyMedium)
+                }
+
+                OutlinedTextField(
+                    value = tableNumber,
+                    onValueChange = { tableNumber = it.filter(Char::isDigit) },
+                    label = { Text("Table Number") },
+                    singleLine = true,
+                    isError = showErrors && tableNumber.isBlank(),
+                    supportingText = {
+                        if (showErrors && tableNumber.isBlank())
+                            Text("Table Number is required", color = MaterialTheme.colorScheme.error)
+                    }
+                )
+
+                OutlinedTextField(
+                    value = capacity,
+                    onValueChange = { capacity = it.filter(Char::isDigit) },
+                    label = { Text("Capacity") },
+                    singleLine = true,
+                    isError = showErrors && capacity.isBlank(),
+                    supportingText = {
+                        if (showErrors && capacity.isBlank())
+                            Text("Capacity is required", color = MaterialTheme.colorScheme.error)
+                    }
+                )
+
+                OutlinedTextField(
+                    value = location,
+                    onValueChange = { location = it },
+                    label = { Text("Location (optional)") },
+                    singleLine = true
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Available", style = MaterialTheme.typography.bodyMedium)
+                    Switch(
+                        checked = isAvailable,
+                        onCheckedChange = { isAvailable = it },
+                        thumbContent = {
+                            if (isAvailable) Icon(Icons.Default.Check, contentDescription = null)
+                        }
+                    )
+                }
+            }
+        },
+        shape = RoundedCornerShape(16.dp)
     )
 }
+

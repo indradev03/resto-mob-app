@@ -5,10 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.indradev_resto.model.UserModel
 import com.example.indradev_resto.repository.UserRepository
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.FirebaseDatabase
 
 
 // hamile kun repository sanga yolai connect garaune tei pass garne
@@ -112,20 +111,35 @@ class UserViewModel(val repository: UserRepository): ViewModel(){
 
 
 
-    fun deleteAccount(userId: String, callback: (Boolean, String) -> Unit){}
+    fun deleteAccount(userId: String, callback: (Boolean, String) -> Unit) {
+        FirebaseDatabase.getInstance().reference.child("users").child(userId)
+            .removeValue()
+            .addOnSuccessListener {
+                callback(true, "User deleted successfully.")
+            }
+            .addOnFailureListener {
+                callback(false, it.message ?: "Failed to delete user.")
+            }
+    }
+
+
 
 
     private val _allUsers = MutableLiveData<List<UserModel>>()
     val allUsers: LiveData<List<UserModel>> get() = _allUsers
 
-    fun fetchAllUsers(callback: (Boolean, String) -> Unit) {
-        repository.getAllUsers { success, message, users ->
-            if (success) {
+    fun fetchAllUsers(callback: () -> Unit) {
+        FirebaseDatabase.getInstance().reference.child("users")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val users = snapshot.children.mapNotNull { it.getValue(UserModel::class.java) }
                 _allUsers.postValue(users)
+         }
+            .addOnFailureListener { exception ->
+                _allUsers.postValue(emptyList())
             }
-            callback(success, message)
-        }
-    }
 
+
+    }
 
 }

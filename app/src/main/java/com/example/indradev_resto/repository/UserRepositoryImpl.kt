@@ -126,27 +126,17 @@ class UserRepositoryImpl : UserRepository {
     }
 
     override fun deleteAccount(userId: String, callback: (Boolean, String) -> Unit) {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            currentUser.delete()
-                .addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        ref.child(userId).removeValue()
-                            .addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    callback(true, "Account deleted successfully")
-                                } else {
-                                    callback(false, "Account deleted from auth but failed from database")
-                                }
-                            }
-                    } else {
-                        callback(false, "${it.exception?.message}")
-                    }
+        // If this is admin trying to delete someone else:
+        ref.child(userId).removeValue()
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    callback(true, "User removed from database.")
+                } else {
+                    callback(false, "Failed to remove user: ${it.exception?.message}")
                 }
-        } else {
-            callback(false, "User not logged in")
-        }
+            }
     }
+
 
     override fun getAllUsers(callback: (Boolean, String, List<UserModel>) -> Unit) {
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
