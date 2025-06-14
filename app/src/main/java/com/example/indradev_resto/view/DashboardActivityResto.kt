@@ -183,7 +183,6 @@ fun RestoBottomNavigationBar(
 fun TopNavigationBar(onNavigateTo: (Int) -> Unit) {
     val context = LocalContext.current
     var showMenu by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
 
     Row(
         modifier = Modifier
@@ -193,6 +192,8 @@ fun TopNavigationBar(onNavigateTo: (Int) -> Unit) {
             .statusBarsPadding(),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Spacer(modifier = Modifier.weight(1f)) // Pushes buttons to the right
+
         // Profile Button
         ImageButton(
             imageRes = R.drawable.user,
@@ -202,26 +203,6 @@ fun TopNavigationBar(onNavigateTo: (Int) -> Unit) {
         ) {
             onNavigateTo(3) // Profile screen
         }
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        // Search Field
-        TextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            placeholder = { Text("Search...") },
-            modifier = Modifier
-                .weight(1f)
-                .height(50.dp),
-            shape = RoundedCornerShape(12.dp),
-            singleLine = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFFF0F0F0),
-                unfocusedContainerColor = Color(0xFFF0F0F0),
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            )
-        )
 
         Spacer(modifier = Modifier.width(12.dp))
 
@@ -272,6 +253,8 @@ fun TopNavigationBar(onNavigateTo: (Int) -> Unit) {
         }
     }
 }
+
+
 
 @Composable
 fun ImageButton(

@@ -1,12 +1,14 @@
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.indradev_resto.model.BookingModel
 import com.example.indradev_resto.model.TableModel
@@ -26,11 +28,9 @@ fun BookingScreen(
     val coroutineScope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(true) }
 
-    // Dialog state
     var showDialog by remember { mutableStateOf(false) }
     var selectedTable by remember { mutableStateOf<TableModel?>(null) }
 
-    // Load tables initially
     LaunchedEffect(Unit) {
         loading = true
         tableViewModel.getAllTables { success, msg, _ ->
@@ -44,102 +44,75 @@ fun BookingScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { paddingValues ->
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 0.dp,
+                    bottom = 0.dp
+                )
+
         ) {
-            Text("Available Tables", style = MaterialTheme.typography.headlineMedium)
+            Text(
+                text = "\uD83D\uDCCB Available Tables", // 📋 emoji
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    color = Color(0xFF3F51B5), // custom indigo shade
+                    fontWeight = FontWeight.Bold
+                )
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
 
             if (loading) {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             } else if (tables.isEmpty()) {
                 Text("No tables available. $message")
             } else {
-                LazyColumn {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(tables) { table ->
-                        TableBookingItem(table = table, onBook = {
+                        TableBookingCard(table = table, onBook = {
                             selectedTable = it
                             showDialog = true
                         })
-                        Divider()
                     }
                 }
             }
         }
     }
 
-    // Booking dialog
     if (showDialog && selectedTable != null) {
-        var name by remember { mutableStateOf("") }
-        var contact by remember { mutableStateOf("") }
-        var date by remember { mutableStateOf("") }
+        BookingDialog(
+            selectedTable = selectedTable!!,
+            onDismiss = { showDialog = false },
+            onConfirm = { name, contact, date ->
+                val booking = BookingModel(
+                    bookingId = "",
+                    tableId = selectedTable!!.tableId,
+                    tableNumber = selectedTable!!.tableNumber,
+                    customerName = name,
+                    contactNumber = contact,
+                    bookingDate = date
+                )
 
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Book Table #${selectedTable!!.tableNumber}") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        label = { Text("Customer Name") }
-                    )
-                    OutlinedTextField(
-                        value = contact,
-                        onValueChange = { contact = it },
-                        label = { Text("Contact Number") }
-                    )
-                    OutlinedTextField(
-                        value = date,
-                        onValueChange = { date = it },
-                        label = { Text("Booking Date") }
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        val booking = BookingModel(
-                            bookingId = "", // Firestore will assign
-                            tableId = selectedTable!!.tableId,
-                            tableNumber = selectedTable!!.tableNumber,
-                            customerName = name,
-                            contactNumber = contact,
-                            bookingDate = date
-                        )
-                        // Insert booking
-                        bookingViewModel.insertBooking(booking) { success, msg ->
+                bookingViewModel.insertBooking(booking) { success, msg ->
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(msg)
+                    }
+                    if (success) {
+                        tableViewModel.markTableUnavailable(selectedTable!!.tableId) { _, updateMsg ->
                             coroutineScope.launch {
-                                snackbarHostState.showSnackbar(msg)
+                                snackbarHostState.showSnackbar(updateMsg)
                             }
-                            if (success) {
-                                // Mark the table unavailable after booking success
-                                tableViewModel.markTableUnavailable(selectedTable!!.tableId) { updateSuccess, updateMsg ->
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar(updateMsg)
-                                    }
-                                    // Refresh the tables list after update
-                                    tableViewModel.getAllTables { _, _, _ -> }
-                                }
-                            }
-                            showDialog = false
+                            tableViewModel.getAllTables { _, _, _ -> }
                         }
-                    },
-                    enabled = name.isNotBlank() && contact.isNotBlank() && date.isNotBlank()
-                ) {
-                    Text("Confirm")
-                }
-            },
-            dismissButton = {
-                OutlinedButton(onClick = { showDialog = false }) {
-                    Text("Cancel")
+                    }
+                    showDialog = false
                 }
             }
         )
@@ -147,28 +120,91 @@ fun BookingScreen(
 }
 
 @Composable
-fun TableBookingItem(table: TableModel, onBook: (TableModel) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+fun TableBookingCard(table: TableModel, onBook: (TableModel) -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column {
-            Text("Table #${table.tableNumber}", style = MaterialTheme.typography.titleMedium)
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Table details
+            Text("Table #${table.tableNumber}", style = MaterialTheme.typography.titleLarge)
             Text("Capacity: ${table.capacity}", style = MaterialTheme.typography.bodyMedium)
             Text(
-                "Available: ${if (table.isAvailable) "Yes" else "No"}",
-                color = if (table.isAvailable) Color(0xFF4CAF50) else Color.Red,
-                style = MaterialTheme.typography.bodyMedium
+                "Status: ${if (table.isAvailable) "Available" else "Booked"}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (table.isAvailable) Color(0xFF4CAF50) else Color.Red
             )
-        }
-        Button(
-            enabled = table.isAvailable,
-            onClick = { onBook(table) }
-        ) {
-            Text("Book")
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Right-aligned button
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = { onBook(table) },
+                    enabled = table.isAvailable,
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Text("Book")
+                }
+            }
         }
     }
+}
+
+
+@Composable
+fun BookingDialog(
+    selectedTable: TableModel,
+    onDismiss: () -> Unit,
+    onConfirm: (name: String, contact: String, date: String) -> Unit
+) {
+    var name by remember { mutableStateOf("") }
+    var contact by remember { mutableStateOf("") }
+    var date by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("Book Table #${selectedTable.tableNumber}")
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Customer Name") },
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = contact,
+                    onValueChange = { contact = it },
+                    label = { Text("Contact Number") },
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = date,
+                    onValueChange = { date = it },
+                    label = { Text("Booking Date") }, // Replace with date picker in future
+                    singleLine = true
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onConfirm(name, contact, date) },
+                enabled = name.isNotBlank() && contact.isNotBlank() && date.isNotBlank()
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+        shape = RoundedCornerShape(16.dp)
+    )
 }
