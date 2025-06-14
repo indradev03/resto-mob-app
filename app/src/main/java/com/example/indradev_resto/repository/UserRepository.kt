@@ -41,4 +41,7 @@ interface UserRepository {
 
     fun deleteAccount(userId: String, callback: (Boolean, String) -> Unit)
 
+    fun getAllUsers(callback: (Boolean, String, List<UserModel>) -> Unit)
+
+
 }

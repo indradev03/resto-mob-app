@@ -115,4 +115,17 @@ class UserViewModel(val repository: UserRepository): ViewModel(){
     fun deleteAccount(userId: String, callback: (Boolean, String) -> Unit){}
 
 
+    private val _allUsers = MutableLiveData<List<UserModel>>()
+    val allUsers: LiveData<List<UserModel>> get() = _allUsers
+
+    fun fetchAllUsers(callback: (Boolean, String) -> Unit) {
+        repository.getAllUsers { success, message, users ->
+            if (success) {
+                _allUsers.postValue(users)
+            }
+            callback(success, message)
+        }
+    }
+
+
 }

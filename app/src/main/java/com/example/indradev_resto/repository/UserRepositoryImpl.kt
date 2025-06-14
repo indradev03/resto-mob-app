@@ -147,4 +147,22 @@ class UserRepositoryImpl : UserRepository {
             callback(false, "User not logged in")
         }
     }
+
+    override fun getAllUsers(callback: (Boolean, String, List<UserModel>) -> Unit) {
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val usersList = mutableListOf<UserModel>()
+                for (child in snapshot.children) {
+                    val user = child.getValue(UserModel::class.java)
+                    user?.let { usersList.add(it) }
+                }
+                callback(true, "Users fetched successfully", usersList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(false, error.message, emptyList())
+            }
+        })
+    }
+
 }
