@@ -25,7 +25,7 @@ import com.example.indradev_resto.viewmodel.UserViewModel
 
 @Composable
 fun ProfileScreen(
-    onEditClick: () -> Unit // 👈 Add this
+    onEditClick: () -> Unit
 ) {
     val context = LocalContext.current
     val repository = remember { UserRepositoryImpl() }
@@ -55,7 +55,7 @@ fun ProfileScreen(
             .fillMaxSize()
             .padding(24.dp),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
             painter = painterResource(id = R.drawable.lunch4),
@@ -63,7 +63,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .size(120.dp)
                 .padding(top = 16.dp)
-                .background(Color.LightGray, CircleShape)
+                .background(Color(0xFFCCCCCC), CircleShape) // manual background color
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -71,23 +71,26 @@ fun ProfileScreen(
         Text(
             text = userModel?.firstName ?: "Loading...",
             fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF222222) // dark text color
         )
 
         Text(
             text = userModel?.email ?: "",
             fontSize = 16.sp,
-            color = Color.Gray
+            color = Color(0xFF666666) // medium gray for email text
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = {
-                onEditClick() // 👈 Trigger navigation
-            },
+            onClick = { onEditClick() },
             shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth(0.8f)
+            modifier = Modifier.fillMaxWidth(0.8f),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF007AFF), // blue button background
+                contentColor = Color.White // white text on button
+            )
         ) {
             Text("Edit Profile")
         }
@@ -108,7 +111,11 @@ fun ProfileScreen(
                 }
             },
             shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth(0.8f)
+            modifier = Modifier.fillMaxWidth(0.8f),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = Color(0xFF007AFF) // blue text color for outlined button
+            ),
+            border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp)
         ) {
             Text("Log Out")
         }
@@ -118,7 +125,7 @@ fun ProfileScreen(
         Text(
             text = "App Version 1.0.0",
             fontSize = 12.sp,
-            color = Color.LightGray
+            color = Color(0xFFAAAAAA) // light gray text for version
         )
     }
 }
