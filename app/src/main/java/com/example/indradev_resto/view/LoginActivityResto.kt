@@ -11,39 +11,19 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -54,264 +34,220 @@ import com.example.indradev_resto.repository.UserRepositoryImpl
 import com.example.indradev_resto.view.ui.theme.Indradev_RESTOTheme
 import com.example.indradev_resto.viewmodel.UserViewModel
 
-
 class LoginActivityResto : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             Indradev_RESTOTheme {
-                // This is the base (Scaffold)
                 Scaffold { innerPadding ->
                     RestoLoginBody(innerPadding)
                 }
             }
         }
-
     }
 }
 
-
 @Composable
-fun RestoLoginBody(innerPadding: PaddingValues)
-{
-
-    // LocalContext le arko file sanga add garauxa
-    val context = LocalContext.current  // Add this at the top of LoginBody()
-
-
+fun RestoLoginBody(innerPadding: PaddingValues) {
+    val context = LocalContext.current
     val repository = remember { UserRepositoryImpl() }
     val userViewModel = remember { UserViewModel(repository) }
 
     val adminEmail = "admin@gmail.com"
     val adminPassword = "admin123"
 
-
-    // email
-    var  email by remember { mutableStateOf("") }
-    //Password
-    var  password by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
-
-    //Checkbox
     var rememberMe by remember { mutableStateOf(false) }
 
-    // for connecting registeration
     val activity = context as? Activity
-
-    val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
     val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
-
-    val localEmail : String? = sharedPreferences.getString("email","")
-    val localpassword : String? = sharedPreferences.getString("password","")
-
-
-    //yo lai cmt hanye remember me wala passowrd hatxa
-    LaunchedEffect(Unit) {
-        val localEmail = sharedPreferences.getString("email", "")
-        val localPassword = sharedPreferences.getString("password", "")
-        email = localEmail ?: ""
-        password = localPassword ?: ""
-    }
-
     val editor = sharedPreferences.edit()
 
+    LaunchedEffect(Unit) {
+        email = sharedPreferences.getString("email", "") ?: ""
+        password = sharedPreferences.getString("password", "") ?: ""
+    }
 
-    Column (
+    val listState = rememberLazyListState()
+
+    LazyColumn(
         modifier = Modifier
             .padding(innerPadding)
             .fillMaxSize()
-            .background(color = Color.White)
-            .padding(top = 5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(Color.White)
+            .padding(top = 5.dp)
+            .imePadding(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        state = listState,
+        contentPadding = PaddingValues(vertical = 20.dp, horizontal = 10.dp)
     ) {
 
-        //Top or LOGO Image
-        Image(
-            painter = painterResource(R.drawable.restologo),
-            contentDescription = null,
-            modifier = Modifier
-                .height(350.dp)
-                .width(350.dp)
-        )
-
-
-        // For Email
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp)
-                .padding(top = 50.dp),
-            shape = RoundedCornerShape(12.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-
-            placeholder = {
-                Text(
-                    text = "Enter your email",
-
-                    )
-            },
-            value = email,
-            onValueChange = { input -> email = input }
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-
-        // for Password
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp),
-            shape = RoundedCornerShape(12.dp),
-            // Lukaune kaam garxa
-            visualTransformation =
-                if (!passwordVisibility) PasswordVisualTransformation()
-                else VisualTransformation.None,
-
-            // Keyboard Option EMail, Text, Password
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-
-            // For visibilty and non visibility
-            suffix = {
-                Icon(
-                    painter = painterResource(
-                        if(!passwordVisibility)
-                            R.drawable.baseline_visibility_off_24 else R.drawable.baseline_visibility_24
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier.clickable {
-                        passwordVisibility = !passwordVisibility
-                    }
-                )
-            },
-            placeholder = {
-                Text(
-                    text = "******",
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            },
-            value = password,
-            onValueChange = { input -> password = input }
-        )
-
-        // Check box and Forget Password Linkup
-        Row (modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically)
-        {
-            Row (
-                verticalAlignment = Alignment.CenterVertically,
-            ){
-                Checkbox(checked = rememberMe,
-                    onCheckedChange = {remember->
-                        rememberMe = remember
-                    },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = Color.Blue, // this is for chnage color after checked in
-
-                        checkmarkColor = Color.White // This is for tick one
-                    )
-                )
-
-                Text(
-                    text = "Remember Me"
-                )
-
-            }
-            // 🔗 Forgot Password Text
-            Text(
-                text = "Forget Password",
-                modifier = Modifier.padding(end = 5.dp)
-                    .clickable {  },
-
-                color = Color.Blue,
+        item {
+            Image(
+                painter = painterResource(R.drawable.restologo),
+                contentDescription = null,
+                modifier = Modifier
+                    .height(350.dp)
+                    .width(350.dp)
             )
         }
 
+        item {
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                placeholder = { Text(text = "Enter your email", color = Color.Gray) },
+                value = email,
+                onValueChange = { email = it },
+                textStyle = TextStyle(color = Color.Black)
+            )
+        }
 
-        Spacer(modifier = Modifier.height(30.dp))
+        item { Spacer(modifier = Modifier.height(20.dp)) }
 
-        // 🔘 Login Button
-        Button(
-            onClick = {
-                if (email == adminEmail && password == adminPassword) {
-                    // Direct Admin Access
-                    val intent = Intent(context, AdminDashboardActivityResto::class.java)
-                    context.startActivity(intent)
-                    activity?.finish()
-                } else {
-                    // Regular Firebase Login
-                    userViewModel.login(email, password) { success, message ->
-                        if (success) {
-                            val userId = userViewModel.getCurrentUser()?.uid
-                            if (userId != null) {
-                                userViewModel.getUserFromDatabase(userId) { dbSuccess, dbMessage, userModel ->
-                                    if (dbSuccess && userModel != null) {
-                                        editor.putString("email", email)
-                                        editor.putString("password", password)
-                                        editor.putString("firstName", userModel.firstName)
-                                        editor.apply()
+        item {
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                visualTransformation = if (!passwordVisibility)
+                    PasswordVisualTransformation()
+                else VisualTransformation.None,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                suffix = {
+                    Icon(
+                        painter = painterResource(
+                            if (!passwordVisibility)
+                                R.drawable.baseline_visibility_off_24
+                            else R.drawable.baseline_visibility_24
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier.clickable {
+                            passwordVisibility = !passwordVisibility
+                        }
+                    )
+                },
+                placeholder = { Text(text = "******", color = Color.Gray) },
+                value = password,
+                onValueChange = { password = it },
+                textStyle = TextStyle(color = Color.Black)
+            )
+        }
 
-                                        val intent = Intent(context, DashboardActivityResto::class.java)
-                                        context.startActivity(intent)
-                                        activity?.finish()
-                                    } else {
-                                        Toast.makeText(context, "Failed to fetch user info", Toast.LENGTH_SHORT).show()
+        item { Spacer(modifier = Modifier.height(10.dp)) }
+
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = rememberMe,
+                        onCheckedChange = { rememberMe = it },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = Color.Blue,
+                            checkmarkColor = Color.White
+                        )
+                    )
+                    Text(text = "Remember Me", color = Color.Black)
+                }
+
+                Text(
+                    text = "Forget Password",
+                    modifier = Modifier.clickable { /* TODO */ },
+                    color = Color(0xFF0A84FF)
+                )
+            }
+        }
+
+        item { Spacer(modifier = Modifier.height(30.dp)) }
+
+        item {
+            Button(
+                onClick = {
+                    if (email == adminEmail && password == adminPassword) {
+                        val intent = Intent(context, AdminDashboardActivityResto::class.java)
+                        context.startActivity(intent)
+                        activity?.finish()
+                        activity?.overridePendingTransition(
+                            android.R.anim.fade_in,
+                            android.R.anim.fade_out
+                        )
+                    } else {
+                        userViewModel.login(email, password) { success, message ->
+                            if (success) {
+                                val userId = userViewModel.getCurrentUser()?.uid
+                                if (userId != null) {
+                                    userViewModel.getUserFromDatabase(userId) { dbSuccess, _, userModel ->
+                                        if (dbSuccess && userModel != null) {
+                                            editor.putString("email", email)
+                                            editor.putString("password", password)
+                                            editor.putString("firstName", userModel.firstName)
+                                            editor.apply()
+
+                                            val intent = Intent(context, DashboardActivityResto::class.java)
+                                            context.startActivity(intent)
+                                            activity?.finish()
+                                            activity?.overridePendingTransition(
+                                                android.R.anim.fade_in,
+                                                android.R.anim.fade_out
+                                            )
+                                        } else {
+                                            Toast.makeText(context, "Failed to fetch user info", Toast.LENGTH_SHORT).show()
+                                        }
                                     }
+                                } else {
+                                    Toast.makeText(context, "Login user ID not found", Toast.LENGTH_SHORT).show()
                                 }
                             } else {
-                                Toast.makeText(context, "Login user ID not found", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                             }
-                        } else {
-                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                         }
                     }
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0A84FF)) // Blue
-        ) {
-            Text("Login")
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0A84FF))
+            ) {
+                Text("Login", color = Color.White)
+            }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        item { Spacer(modifier = Modifier.height(20.dp)) }
 
-
-        // If already have aacount Sign up link
-        Row (modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ){
-
-
-            Text("Don't have an account? ")
-            // 🆕 Sign Up Prompt
-            // Then inside the clickable Sign Up text:
-            Text(
-                text = "Sign Up",
-                modifier = Modifier.clickable {
-                    // Connected with registrationActivity
-                    val intent = Intent(context, RegistrationActivityResto::class.java)
-                    context.startActivity(intent)
-                },
-
-                color = Color.Blue
-            )
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text("Don't have an account? ", color = Color.Black)
+                Text(
+                    text = "Sign Up",
+                    modifier = Modifier.clickable {
+                        val intent = Intent(context, RegistrationActivityResto::class.java)
+                        context.startActivity(intent)
+                        activity?.overridePendingTransition(
+                            android.R.anim.fade_in,
+                            android.R.anim.fade_out
+                        )
+                    },
+                    color = Color(0xFF0A84FF)
+                )
+            }
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun RestoLoginpreBody(){
-    RestoLoginBody(innerPadding = PaddingValues(0.dp))
+fun RestoLoginPreview() {
+    Indradev_RESTOTheme {
+        RestoLoginBody(innerPadding = PaddingValues(0.dp))
+    }
 }

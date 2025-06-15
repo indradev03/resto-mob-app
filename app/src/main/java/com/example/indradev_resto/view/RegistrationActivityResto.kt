@@ -9,16 +9,20 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.material3.ExposedDropdownMenuDefaults.outlinedTextFieldColors
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -53,32 +57,22 @@ class RegistrationActivityResto : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestoRegistrationBody(innerPadding: PaddingValues) {
-
-    //this is better
     val repository = remember { UserRepositoryImpl() }
     val userViewModel = remember { UserViewModel(repository) }
 
-
-
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
-
-
-    //Email
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-
-    //DropDown Menu
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf("Select Country") }
     val options = listOf("Nepal", "USA", "New Zealand")
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
-    // LocalContext le arko file sanga add garauxa
-    //And This if for Date Picker
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)
@@ -86,11 +80,9 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
     val day = calendar.get(Calendar.DAY_OF_MONTH)
     var selectedDate by remember { mutableStateOf("DOB") }
 
-    //Radio Button Or Gender
     var selectedGender by remember { mutableStateOf("Male") }
     var rememberMe by remember { mutableStateOf(false) }
 
-    //DatePicker
     val datePickerDialog = DatePickerDialog(
         context,
         { _, selectedYear, selectedMonth, selectedDay ->
@@ -101,156 +93,172 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
 
     val activity = context as? Activity
 
-    Column(
+    // Animate changes for the whole form content
+    val transition = updateTransition(targetState = rememberMe, label = "rememberMeTransition")
+
+    LazyColumn(
         modifier = Modifier
             .padding(innerPadding)
             .fillMaxSize()
-            .background(Color.White)
+            .imePadding() // makes space for keyboard
+            .background(Color.White),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, top = 10.dp)
-                .padding(8.dp)
-        ) {
-            Button(
-                onClick = {
-                    activity?.finish()
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF0A84FF)// Blue
-                )
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
             ) {
-                // Then inside the clickable Sign In text:
-                Text(
-                    text = "Back",
-                    modifier = Modifier.clickable {
-                        // Connected with LoginActivity
-                        val intent = Intent(context, LoginActivityResto::class.java)
-                        context.startActivity(intent)
-                    },
-                    color = Color.White
-                )
-
+                IconButton(
+                    onClick = {
+                        activity?.finish()
+                        activity?.overridePendingTransition(
+                            android.R.anim.fade_in,
+                            android.R.anim.fade_out
+                        )
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color(0xFF0A84FF)
+                    )
+                }
             }
         }
-        // For Main Heading
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(text = "Register", fontSize = 25.sp)
-        }
 
 
-        Spacer(modifier = Modifier.height(30.dp))
-        // For Firstname and last name textfiled
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            OutlinedTextField(
-                value = firstName,
-                onValueChange = { firstName = it },
-                label = { Text("First Name") },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp)
-            )
-
-            OutlinedTextField(
-                value = lastName,
-                onValueChange = { lastName = it },
-                label = { Text("Last Name") },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp)
+        item {
+            Text(
+                text = "Register",
+                fontSize = 30.sp,
+                color = Color(0xFF222222), // Darker text color for headings
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.headlineMedium
             )
         }
-        // For Email textfiled
-        Row {
+
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedTextField(
+                    value = firstName,
+                    onValueChange = { firstName = it },
+                    label = { Text("First Name", color = Color(0xFF444444)) },
+                    modifier = Modifier.weight(1f),
+                    colors = outlinedTextFieldColors(
+                        focusedBorderColor = Color(0xFF0A84FF),
+                        focusedLabelColor = Color(0xFF0A84FF),
+                        cursorColor = Color(0xFF0A84FF),
+                        focusedTextColor = Color(0xFF222222),
+                        unfocusedTextColor = Color(0xFF222222),
+                    )
+                )
+
+                OutlinedTextField(
+                    value = lastName,
+                    onValueChange = { lastName = it },
+                    label = { Text("Last Name", color = Color(0xFF444444)) },
+                    modifier = Modifier.weight(1f),
+                    colors = outlinedTextFieldColors(
+                        focusedBorderColor = Color(0xFF0A84FF),
+                        focusedLabelColor = Color(0xFF0A84FF),
+                        cursorColor = Color(0xFF0A84FF),
+                        focusedTextColor = Color(0xFF222222),
+                        unfocusedTextColor = Color(0xFF222222),
+                    )
+                )
+            }
+        }
+
+        item {
             OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp),
+                modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 prefix = {
                     Icon(
                         painter = painterResource(R.drawable.baseline_email_24),
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = Color(0xFF0A84FF)
                     )
                 },
-                placeholder = { Text("Email") },
+                placeholder = { Text("Email", color = Color.Gray) },
                 value = email,
-                onValueChange = { input -> email = input }
+                onValueChange = { email = it },
+                colors = outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF0A84FF),
+                    focusedLabelColor = Color(0xFF0A84FF),
+                    cursorColor = Color(0xFF0A84FF),
+                    focusedTextColor = Color(0xFF222222),
+                    unfocusedTextColor = Color(0xFF222222),
+                )
             )
         }
-        Spacer(modifier = Modifier.height(15.dp))
 
-        Row {
+        item {
             OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp),
+                modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 prefix = {
                     Icon(
                         painter = painterResource(R.drawable.baseline_password_24),
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = Color(0xFF0A84FF)
                     )
                 },
-                placeholder = { Text("Password") },
+                placeholder = { Text("Password", color = Color.Gray) },
                 value = password,
-                onValueChange = { input -> password = input }
+                onValueChange = { password = it },
+                colors = outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF0A84FF),
+                    focusedLabelColor = Color(0xFF0A84FF),
+                    cursorColor = Color(0xFF0A84FF),
+                    focusedTextColor = Color(0xFF222222),
+                    unfocusedTextColor = Color(0xFF222222),
+                )
             )
         }
-        //Dropdown menu or Select Country
-        Row {
+
+        item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(15.dp)
+                    .clickable { expanded = true }
             ) {
                 OutlinedTextField(
                     value = selectedOptionText,
                     onValueChange = {},
+                    enabled = false,
+                    shape = RoundedCornerShape(12.dp),
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            tint = Color(0xFF0A84FF)
+                        )
+                    },
+                    colors = outlinedTextFieldColors(
+                        disabledTextColor = Color.Black,
+                        disabledContainerColor = Color.Gray.copy(alpha = 0.2f),
+                        disabledBorderColor = Color.Gray.copy(alpha = 0.3f)
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .onGloballyPositioned { coordinates ->
                             textFieldSize = coordinates.size.toSize()
                         }
-                        .clickable { expanded = true },
-                    placeholder = { Text("") },
-                    enabled = false,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = TextFieldDefaults.colors(
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f),
-                        disabledIndicatorColor = Color.Transparent,
-                        disabledTextColor = Color.Black
-                    ),
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null
-                        )
-                    }
                 )
-                // Drop Down Menu
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    modifier = Modifier.width(with(LocalDensity.current) {
-                        textFieldSize.width.toDp()
-                    })
+                    modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
                 ) {
                     options.forEach { option ->
                         DropdownMenuItem(
-                            text = { Text(option) },
+                            text = { Text(option, color = Color.White) },
                             onClick = {
                                 selectedOptionText = option
                                 expanded = false
@@ -261,12 +269,10 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
             }
         }
 
-        //For Date of birth or datepicker
-        Row {
+        item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(15.dp)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
@@ -275,157 +281,118 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                     }
             ) {
                 OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
                     value = selectedDate,
                     onValueChange = {},
                     enabled = false,
-                    placeholder = { Text("DOB") },
-                    shape = RoundedCornerShape(12.dp)
-                )
-            }
-        }
-
-        // For radio button or Genders
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Gender label at the top
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Gender",
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                // Row for the radio buttons, placed below the "Gender" label
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(25.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    listOf("Male", "Female", "Other").forEach { gender ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.clickable { selectedGender = gender }
-                        ) {
-                            RadioButton(
-                                selected = (selectedGender == gender),
-                                onClick = { selectedGender = gender }
-                            )
-                            Text(
-                                text = gender,
-                                modifier = Modifier.padding(start = 15.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        //For check box and term and condtion
-        Row (modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically)
-        {
-            Row (
-                verticalAlignment = Alignment.CenterVertically,
-            ){
-                Checkbox(checked = rememberMe,
-                    onCheckedChange = {remember->
-                        rememberMe = remember
-                    },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = Color.Green, // this is for chnage color after checked in
-
-                        checkmarkColor = Color.White // This is for tick one
+                    shape = RoundedCornerShape(12.dp),
+                    placeholder = { Text("DOB", color = Color.Gray) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = outlinedTextFieldColors(
+                        disabledTextColor = Color.Black,
+                        disabledContainerColor = Color.Gray.copy(alpha = 0.2f),
+                        disabledBorderColor = Color.Gray.copy(alpha = 0.3f)
                     )
                 )
-
-                Text(
-                    text = "I accept terms and condition"
-                )
-
             }
         }
 
-        // This is spacer between check box and Register button
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // 🔘 Register Button
-        Button(
-            onClick = {
-                // Handle login click
-                userViewModel.register(email, password){
-                        success,message,userId ->
-                    if (success){
-                        var model = UserModel(
-                            userId, email, password, firstName, lastName,
-                            selectedOptionText,selectedDate,selectedGender
+        item {
+            Text(text = "Gender", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, color = Color(0xFF222222))
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(25.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                listOf("Male", "Female", "Other").forEach { gender ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { selectedGender = gender }
+                    ) {
+                        RadioButton(
+                            selected = (selectedGender == gender),
+                            onClick = { selectedGender = gender },
+                            colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF0A84FF))
                         )
-                        userViewModel.addUserToDatabase(userId,model){
-                                success,message ->
-                            if (success){
-                                activity?.finish() // Close registration activity
-                                Toast.makeText(context,message, Toast.LENGTH_LONG).show()
-
-
-
-                            }else{
-                                Toast.makeText(context,message, Toast.LENGTH_LONG).show()
-
-                            }
-                        }
-                    }else{
-                        Toast.makeText(context,message, Toast.LENGTH_LONG).show()
-
+                        Text(
+                            text = gender,
+                            modifier = Modifier.padding(start = 8.dp),
+                            color = Color(0xFF222222)
+                        )
                     }
-
                 }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0A84FF)) // Blue
-        ) {
-            Text("Register")
+            }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        item {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Checkbox(
+                    checked = rememberMe,
+                    onCheckedChange = { rememberMe = it },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = Color(0xFF0A84FF),
+                        checkmarkColor = Color.White
+                    )
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "I accept terms and condition", color = Color(0xFF222222))
+            }
+        }
 
-
-        // If already have aacount Sign In link
-        Row (modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ){
-
-            Text("Already have an account? ")
-            // 🆕 Sign Up Prompt
-            // Then inside the clickable Sign In text:
-            Text(
-                text = "Sign In",
-                modifier = Modifier.clickable {
-                    // Connected with LoginActivity
-                    val intent = Intent(context, LoginActivityResto::class.java)
-                    context.startActivity(intent)
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {
+                    userViewModel.register(email, password) { success, message, userId ->
+                        if (success) {
+                            val model = UserModel(
+                                userId, email, password, firstName, lastName,
+                                selectedOptionText, selectedDate, selectedGender
+                            )
+                            userViewModel.addUserToDatabase(userId, model) { addSuccess, addMessage ->
+                                if (addSuccess) {
+                                    activity?.finish()
+                                    Toast.makeText(context, addMessage, Toast.LENGTH_LONG).show()
+                                } else {
+                                    Toast.makeText(context, addMessage, Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        } else {
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                        }
+                    }
                 },
-                color = Color.Blue
-            )
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0A84FF))
+            ) {
+                Text("Register", color = Color.White)
+            }
         }
 
+        item {
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(text = "Already have an account? ", color = Color(0xFF222222))
+                Text(
+                    text = "Sign In",
+                    modifier = Modifier.clickable {
+                        val intent = Intent(context, LoginActivityResto::class.java)
+                        context.startActivity(intent)
+                        activity?.overridePendingTransition(
+                            android.R.anim.fade_in,
+                            android.R.anim.fade_out
+                        )
+                    },
+                    color = Color(0xFF0A84FF)
+                )
+            }
+        }
     }
 }
 
-@Preview
-@Composable
-fun RestoRegistrationPreBody() {
-    RestoRegistrationBody(innerPadding = PaddingValues(0.dp))
-}
