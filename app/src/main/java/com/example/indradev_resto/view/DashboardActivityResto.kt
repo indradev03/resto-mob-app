@@ -13,6 +13,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -24,20 +25,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.material.icons.filled.RestaurantMenu
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Help
-import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material3.Icon
 import com.example.indradev_resto.R
 import com.example.indradev_resto.repository.BookingModelRepoImpl
 import com.example.indradev_resto.repository.TableModelRepositoryImpl
 import com.example.indradev_resto.repository.UserRepositoryImpl
-
 import com.example.indradev_resto.view.pages.*
 import com.example.indradev_resto.view.ui.theme.Indradev_RESTOTheme
 import com.example.indradev_resto.viewmodel.BookingViewModel
@@ -47,7 +41,7 @@ import com.example.indradev_resto.viewmodel.UserViewModel
 class DashboardActivityResto : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge()  // keeps system bars visible but content draws edge to edge
         setContent {
             Indradev_RESTOTheme {
                 RestoNavigationBody()
@@ -90,18 +84,17 @@ fun RestoNavigationBody() {
         }
     ) { innerPadding ->
 
-        // Wrap content inside Surface with elevation for shadow
         Surface(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
-            shadowElevation = 8.dp, // add shadow / elevation
+            shadowElevation = 8.dp,
             color = Color.White
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp) // optional padding inside shadow container
+                    .padding(16.dp)
             ) {
                 when (selectedIndex) {
                     0 -> DashboardScreen()
@@ -118,13 +111,12 @@ fun RestoNavigationBody() {
                             selectedIndex = 3 // Back to ProfileScreen
                         }
                     )
-                    5 -> HelpScreen(onBack = { selectedIndex = 0 }) // or whatever your back navigation is
+                    5 -> HelpScreen(onBack = { selectedIndex = 0 })
                 }
             }
         }
     }
 }
-
 
 @Composable
 fun RestoBottomNavigationBar(
@@ -152,7 +144,6 @@ fun RestoBottomNavigationBar(
                 icon = {
                     Box(
                         modifier = Modifier
-                            // Removed background hover effect here
                             .padding(horizontal = 12.dp, vertical = 8.dp)
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -175,7 +166,6 @@ fun RestoBottomNavigationBar(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.primary,
                     unselectedIconColor = Color.Black,
-                    // You can also remove the indicatorColor to remove any background indicator on selection:
                     indicatorColor = Color.Transparent
                 )
             )
@@ -188,101 +178,84 @@ fun TopNavigationBar(onNavigateTo: (Int) -> Unit) {
     val context = LocalContext.current
     var showMenu by remember { mutableStateOf(false) }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .padding(12.dp)
-            .statusBarsPadding(),
-        verticalAlignment = Alignment.CenterVertically
+    Surface(
+        shadowElevation = 4.dp,
+        color = Color.White,
+        modifier = Modifier.statusBarsPadding()  // <-- Important fix here!
     ) {
-        Spacer(modifier = Modifier.weight(1f)) // Pushes buttons to the right
-
-        // Profile Button
-        ImageButton(
-            imageRes = R.drawable.user,
-            description = "Profile",
-            modifier = Modifier.size(48.dp),
-            backgroundColor = Color(0xFFF0F0F0)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            onNavigateTo(3) // Profile screen
-        }
+            Spacer(modifier = Modifier.weight(1f))
 
-        Spacer(modifier = Modifier.width(12.dp))
-
-        // More Menu Button
-        Box {
             ImageButton(
-                imageRes = R.drawable.more,
-                description = "More",
+                imageRes = R.drawable.user,
+                description = "Profile",
                 modifier = Modifier.size(48.dp),
                 backgroundColor = Color(0xFFF0F0F0)
             ) {
-                showMenu = true
+                onNavigateTo(3)
             }
 
-            DropdownMenu(
-                expanded = showMenu,
-                onDismissRequest = { showMenu = false }
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Menu") },
-                    onClick = {
-                        showMenu = false
-                        onNavigateTo(1)
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.RestaurantMenu,
-                            contentDescription = "Menu",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                )
+            Spacer(modifier = Modifier.width(12.dp))
 
-                DropdownMenuItem(
-                    text = { Text("Help") },
-                    onClick = {
-                        showMenu = false
-                        onNavigateTo(5)  // Replace with your actual index or navigation logic
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Help,
-                            contentDescription = "Help",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                )
+            Box {
+                ImageButton(
+                    imageRes = R.drawable.more,
+                    description = "More",
+                    modifier = Modifier.size(48.dp),
+                    backgroundColor = Color(0xFFF0F0F0)
+                ) {
+                    showMenu = true
+                }
 
-
-                DropdownMenuItem(
-                    text = { Text("Logout") },
-                    onClick = {
-                        showMenu = false
-                        val prefs = context.getSharedPreferences("User", Context.MODE_PRIVATE)
-                        prefs.edit().clear().apply()
-
-                        val intent = Intent(context, LoginActivityResto::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Menu") },
+                        onClick = {
+                            showMenu = false
+                            onNavigateTo(1)
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Default.RestaurantMenu, "Menu", tint = MaterialTheme.colorScheme.primary)
                         }
-                        context.startActivity(intent)
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Logout,
-                            contentDescription = "Logout",
-                            tint = Color.Red
-                        )
-                    }
-                )
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Help") },
+                        onClick = {
+                            showMenu = false
+                            onNavigateTo(5)
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Default.Help, "Help", tint = MaterialTheme.colorScheme.primary)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Logout") },
+                        onClick = {
+                            showMenu = false
+                            val prefs = context.getSharedPreferences("User", Context.MODE_PRIVATE)
+                            prefs.edit().clear().apply()
+                            val intent = Intent(context, LoginActivityResto::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                            context.startActivity(intent)
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Default.Logout, "Logout", tint = Color.Red)
+                        }
+                    )
+                }
             }
         }
-
     }
 }
-
-
 
 @Composable
 fun ImageButton(
@@ -295,8 +268,7 @@ fun ImageButton(
     onClick: () -> Unit
 ) {
     Box(
-        modifier = modifier
-            .clickable(onClick = onClick),
+        modifier = modifier.clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Image(
@@ -314,4 +286,3 @@ fun PreviewDashboard() {
         RestoNavigationBody()
     }
 }
-
