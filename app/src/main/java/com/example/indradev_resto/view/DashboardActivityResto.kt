@@ -37,8 +37,9 @@ import com.example.indradev_resto.R
 import com.example.indradev_resto.repository.BookingModelRepoImpl
 import com.example.indradev_resto.repository.TableModelRepositoryImpl
 import com.example.indradev_resto.repository.UserRepositoryImpl
-import com.example.indradev_resto.ui.theme.IndradevRestoTheme
+
 import com.example.indradev_resto.view.pages.*
+import com.example.indradev_resto.view.ui.theme.Indradev_RESTOTheme
 import com.example.indradev_resto.viewmodel.BookingViewModel
 import com.example.indradev_resto.viewmodel.TableViewModel
 import com.example.indradev_resto.viewmodel.UserViewModel
@@ -48,7 +49,7 @@ class DashboardActivityResto : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            IndradevRestoTheme {
+            Indradev_RESTOTheme {
                 RestoNavigationBody()
             }
         }
@@ -95,7 +96,6 @@ fun RestoNavigationBody() {
                 .padding(innerPadding)
                 .fillMaxSize(),
             shadowElevation = 8.dp, // add shadow / elevation
-            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp), // optional rounded corners for better look
             color = Color.White
         ) {
             Box(
@@ -182,10 +182,6 @@ fun RestoBottomNavigationBar(
         }
     }
 }
-
-
-
-
 
 @Composable
 fun TopNavigationBar(onNavigateTo: (Int) -> Unit) {
@@ -314,7 +310,8 @@ fun ImageButton(
 @Preview(showBackground = true)
 @Composable
 fun PreviewDashboard() {
-    IndradevRestoTheme {
+    Indradev_RESTOTheme {
         RestoNavigationBody()
     }
 }
+

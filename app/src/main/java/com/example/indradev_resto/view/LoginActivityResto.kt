@@ -51,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.indradev_resto.R
 import com.example.indradev_resto.repository.UserRepositoryImpl
+import com.example.indradev_resto.view.ui.theme.Indradev_RESTOTheme
 import com.example.indradev_resto.viewmodel.UserViewModel
 
 
@@ -59,13 +60,14 @@ class LoginActivityResto : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            setContent {
+            Indradev_RESTOTheme {
                 // This is the base (Scaffold)
-                Scaffold { innerPadding->
+                Scaffold { innerPadding ->
                     RestoLoginBody(innerPadding)
                 }
             }
         }
+
     }
 }
 

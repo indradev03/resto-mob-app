@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.toSize
 import com.example.indradev_resto.R
 import com.example.indradev_resto.model.UserModel
 import com.example.indradev_resto.repository.UserRepositoryImpl
+import com.example.indradev_resto.view.ui.theme.Indradev_RESTOTheme
 import com.example.indradev_resto.viewmodel.UserViewModel
 
 class RegistrationActivityResto : ComponentActivity() {
@@ -42,10 +43,13 @@ class RegistrationActivityResto : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Scaffold { innerPadding ->
-                RestoRegistrationBody(innerPadding)
+            Indradev_RESTOTheme {
+                Scaffold { innerPadding ->
+                    RestoRegistrationBody(innerPadding)
+                }
             }
         }
+
     }
 }
 

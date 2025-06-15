@@ -1,3 +1,4 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -49,18 +50,18 @@ fun BookingScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(color = Color.White)
                 .padding(
                     start = 16.dp,
                     end = 16.dp,
                     top = 0.dp,
                     bottom = 0.dp
                 )
-
         ) {
             Text(
-                text = "\uD83D\uDCCB Available Tables", // 📋 emoji
+                text = "\uD83D\uDCCB Available Tables",
                 style = MaterialTheme.typography.headlineLarge.copy(
-                    color = Color(0xFF3F51B5), // custom indigo shade
+                    color = Color(0xFF037715),
                     fontWeight = FontWeight.Bold
                 )
             )
@@ -123,34 +124,49 @@ fun BookingScreen(
 fun TableBookingCard(table: TableModel, onBook: (TableModel) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White) // ✅ White background here
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Table details
-            Text("Table #${table.tableNumber}", style = MaterialTheme.typography.titleLarge)
-            Text("Capacity: ${table.capacity}", style = MaterialTheme.typography.bodyMedium)
             Text(
-                "Status: ${if (table.isAvailable) "Available" else "Booked"}",
+                text = "Table #${table.tableNumber}",
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.Black // ✅ Set text color to black
+            )
+            Text(
+                text = "Capacity: ${table.capacity}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Black // ✅ Set text color to black
+            )
+            Text(
+                text = "Status: ${if (table.isAvailable) "Available" else "Booked"}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (table.isAvailable) Color(0xFF4CAF50) else Color.Red
             )
-
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Right-aligned button
             Box(modifier = Modifier.fillMaxWidth()) {
+                val isBooked = !table.isAvailable
+
                 Button(
-                    onClick = { onBook(table) },
-                    enabled = table.isAvailable,
+                    onClick = {
+                        if (!isBooked) onBook(table)
+                    },
                     shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isBooked) Color (0xFF737273) else Color(0xFF0088FF), // 💠 Indigo if available, Gray if booked
+                        contentColor = Color.White
+                    ),
                     modifier = Modifier.align(Alignment.CenterEnd)
                 ) {
-                    Text("Book")
+                    Text(text = if (isBooked) "Booked" else "Book")
                 }
             }
+
+
         }
+
     }
 }
 
@@ -187,7 +203,7 @@ fun BookingDialog(
                 OutlinedTextField(
                     value = date,
                     onValueChange = { date = it },
-                    label = { Text("Booking Date") }, // Replace with date picker in future
+                    label = { Text("Booking Date") },
                     singleLine = true
                 )
             }

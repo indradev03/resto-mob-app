@@ -70,7 +70,7 @@ fun DashboardScreen() {
             Spacer(modifier = Modifier.height(12.dp))
 
             Image(
-                painter = painterResource(id = R.drawable.lunch3),
+                painter = painterResource(id = R.drawable.offers),
                 contentDescription = "Special Offer",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -98,7 +98,7 @@ fun DashboardScreen() {
             Spacer(modifier = Modifier.height(12.dp))
 
             Image(
-                painter = painterResource(id = R.drawable.lunch4),
+                painter = painterResource(id = R.drawable.chef),
                 contentDescription = "Chef",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -129,7 +129,7 @@ fun DashboardScreen() {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.google),
+                    painter = painterResource(id = R.drawable.gallery1),
                     contentDescription = "Dish 1",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -138,7 +138,7 @@ fun DashboardScreen() {
                         .clip(RoundedCornerShape(12.dp))
                 )
                 Image(
-                    painter = painterResource(id = R.drawable.facebook),
+                    painter = painterResource(id = R.drawable.gallery2),
                     contentDescription = "Dish 2",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

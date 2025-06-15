@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.indradev_resto.R
+import com.example.indradev_resto.view.ui.theme.Indradev_RESTOTheme
 import kotlinx.coroutines.delay
 
 class SplashActivityResto : ComponentActivity() {
@@ -33,8 +34,12 @@ class SplashActivityResto : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Scaffold { innerPadding->
-                RestoSplashBody(innerPadding)
+            setContent {
+                Indradev_RESTOTheme {
+                    Scaffold { innerPadding->
+                        RestoSplashBody(innerPadding)
+                    }
+                }
             }
         }
     }

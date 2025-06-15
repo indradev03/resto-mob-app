@@ -12,11 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
+
 private val LightColors = lightColorScheme(
     background = Color.White,
     surface = Color.White,
     onBackground = Color.Black,
-    onSurface = Color.Black
+    onSurface = Color.White
 )
 
 private val DarkColors = darkColorScheme(
@@ -28,15 +29,25 @@ private val DarkColors = darkColorScheme(
 
 
 @Composable
-fun IndradevRestoTheme(
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
+fun Indradev_RESTOTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    // Dynamic color is available on Android 12+
+    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (useDarkTheme) DarkColors else LightColors
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+
+        darkTheme -> DarkColors
+        else -> LightColors
+    }
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = com.example.indradev_resto.view.ui.theme.Typography,
         content = content
     )
 }

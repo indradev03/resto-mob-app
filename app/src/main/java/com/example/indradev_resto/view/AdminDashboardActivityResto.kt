@@ -5,14 +5,15 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.indradev_resto.ui.theme.IndradevRestoTheme
+
 import com.example.indradev_resto.view.pages.AdminDashboardScreen
+import com.example.indradev_resto.view.ui.theme.Indradev_RESTOTheme
 
 class AdminDashboardActivityResto : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            IndradevRestoTheme{
+
                 AdminDashboardScreen(onLogout = {
                 val sharedPreferences = getSharedPreferences("User", Context.MODE_PRIVATE)
                 sharedPreferences.edit().clear().apply()
@@ -20,7 +21,6 @@ class AdminDashboardActivityResto : ComponentActivity() {
                 startActivity(intent)
                 finish()
             })}
-
         }
+
     }
-}

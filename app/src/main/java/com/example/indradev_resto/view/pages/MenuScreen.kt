@@ -153,10 +153,9 @@ fun SpecialProductItem(product: Product, onClick: () -> Unit) {
 fun ProductSection(title: String, products: List<Product>, onProductClick: (Product) -> Unit) {
     Text(
         text = title,
-        style = MaterialTheme.typography.titleLarge.copy(
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        ),
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.Black, // set heading color to black
         modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)
     )
 
