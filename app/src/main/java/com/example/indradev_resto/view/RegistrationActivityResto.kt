@@ -31,6 +31,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -63,35 +64,42 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
     val context = LocalContext.current
     val repository = remember { UserRepositoryImpl() }
     val userViewModel = remember { UserViewModel(repository) }
-    var showError by remember { mutableStateOf(false) }
 
 
+    //for first name and lastname
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var showFirstNameError by remember { mutableStateOf(false) }
     var showLastNameError by remember { mutableStateOf(false) }
 
+    //for email
     var email by remember { mutableStateOf("") }
     var showEmailError by remember { mutableStateOf(false) }
     var emailErrorMessage by remember { mutableStateOf("") }
 
+
+    //For password
     var password by remember { mutableStateOf("") }
     var showPasswordError by remember { mutableStateOf(false) }
     var passwordErrorMessage by remember { mutableStateOf("") }
 
-
+    //this is for Country
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf("") }
     val options = listOf("Nepal", "USA", "New Zealand" , "Australia" ,"Germany")
     var showOptionError by remember { mutableStateOf(false) }
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
+    // This is for Gender
+    var selectedGender by remember { mutableStateOf("") }
+    var showGenderError by remember { mutableStateOf(false) }
 
-
-    var selectedDate by remember { mutableStateOf("") }
-    var selectedGender by remember { mutableStateOf("Male") }
+    // This is for terms and condition
     var rememberMe by remember { mutableStateOf(false) }
+    var showError by remember { mutableStateOf(false) }
 
+    //for date
+    var selectedDate by remember { mutableStateOf("") }
     val calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)
     val month = calendar.get(Calendar.MONTH)
@@ -368,6 +376,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
             }
         }
 
+
         item {
             Column {
                 Box(
@@ -410,7 +419,12 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
 
 
         item {
-            Text(text = "Gender", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, color = Color(0xFF222222))
+            Text(
+                text = "Gender",
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF222222)
+            )
+
             Row(
                 horizontalArrangement = Arrangement.spacedBy(25.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -419,11 +433,18 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                 listOf("Male", "Female", "Other").forEach { gender ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable { selectedGender = gender }
+                        modifier = Modifier.clickable {
+                            selectedGender = gender
+                            showGenderError = false // clear error on selection
+                        }
                     ) {
                         RadioButton(
                             selected = (selectedGender == gender),
-                            onClick = { selectedGender = gender },
+                            onClick = {
+                                selectedGender = if (selectedGender == gender) "" else gender
+                                showGenderError = false
+                                showGenderError = false // clear error on selection
+                            },
                             colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF0A84FF))
                         )
                         Text(
@@ -434,7 +455,17 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                     }
                 }
             }
+
+            if (showGenderError) {
+                Text(
+                    text = "Please select a gender",
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                )
+            }
         }
+
 
         item {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -489,10 +520,6 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                         showLastNameError = false
                     }
 
-                    if (hasError) {
-                        Toast.makeText(context, "Please correct the errors", Toast.LENGTH_SHORT).show()
-                        return@Button
-                    }
 
                     if (email.trim().isEmpty()) {
                         showEmailError = true
@@ -530,6 +557,14 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                     }
 
 
+                    // GENDER
+                    if (selectedGender.isEmpty()) {
+                        showGenderError = true
+                        hasError = true
+                    } else {
+                        showGenderError = false
+                    }
+
                     // Checkbox validation
                     if (!rememberMe) {
                         showError = true
@@ -538,9 +573,13 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                     }
 
 
+                    if (hasError) {
+                        Toast.makeText(context, "All fields are empty", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
                     // Proceed with registration if all fields are valid
                     showError = false // clear error
-
 
                     userViewModel.register(email, password) { success, message, userId ->
                         if (success) {
@@ -568,7 +607,6 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                 Text("Register", color = Color.White)
             }
         }
-
 
 
         item {
