@@ -65,6 +65,9 @@ fun RestoLoginBody(innerPadding: PaddingValues) {
     val activity = context as? Activity
     val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+
 
     LaunchedEffect(Unit) {
         email = sharedPreferences.getString("email", "") ?: ""
@@ -82,7 +85,7 @@ fun RestoLoginBody(innerPadding: PaddingValues) {
             .imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         state = listState,
-        contentPadding = PaddingValues(vertical = 20.dp, horizontal = 10.dp)
+        contentPadding = PaddingValues(vertical = 20.dp, horizontal = 20.dp, )
     ) {
 
         item {
@@ -96,46 +99,79 @@ fun RestoLoginBody(innerPadding: PaddingValues) {
         }
 
         item {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                placeholder = { Text(text = "Enter your email", color = Color.Gray) },
-                value = email,
-                onValueChange = { email = it },
-                textStyle = TextStyle(color = Color.Black)
-            )
+            Column {
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    placeholder = { Text(text = "Enter your email", color = Color.Gray) },
+                    value = email,
+                    onValueChange = {
+                        email = it
+                        emailError = null  // Clear error when user types
+                    },
+                    textStyle = TextStyle(color = Color.Black),
+                    isError = emailError != null
+                )
+
+                // Show error message if any
+                if (emailError != null) {
+                    Text(
+                        text = emailError ?: "",
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                    )
+                }
+            }
         }
+
 
         item { Spacer(modifier = Modifier.height(20.dp)) }
 
         item {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                visualTransformation = if (!passwordVisibility)
-                    PasswordVisualTransformation()
-                else VisualTransformation.None,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                suffix = {
-                    Icon(
-                        painter = painterResource(
-                            if (!passwordVisibility)
-                                R.drawable.baseline_visibility_off_24
-                            else R.drawable.baseline_visibility_24
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier.clickable {
-                            passwordVisibility = !passwordVisibility
-                        }
+            Column {
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    visualTransformation = if (!passwordVisibility)
+                        PasswordVisualTransformation()
+                    else VisualTransformation.None,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    isError = passwordError != null,
+                    suffix = {
+                        Icon(
+                            painter = painterResource(
+                                if (!passwordVisibility)
+                                    R.drawable.baseline_visibility_off_24
+                                else R.drawable.baseline_visibility_24
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier.clickable {
+                                passwordVisibility = !passwordVisibility
+                            }
+                        )
+                    },
+                    placeholder = { Text(text = "******", color = Color.Gray) },
+                    value = password,
+                    onValueChange = {
+                        password = it
+                        passwordError = null  // Clear error on input
+                    },
+                    textStyle = TextStyle(color = Color.Black)
+                )
+
+                if (passwordError != null) {
+                    Text(
+                        text = passwordError ?: "",
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 8.dp, top = 4.dp)
                     )
-                },
-                placeholder = { Text(text = "******", color = Color.Gray) },
-                value = password,
-                onValueChange = { password = it },
-                textStyle = TextStyle(color = Color.Black)
-            )
+                }
+            }
         }
+
 
         item { Spacer(modifier = Modifier.height(10.dp)) }
 
@@ -150,7 +186,7 @@ fun RestoLoginBody(innerPadding: PaddingValues) {
                         checked = rememberMe,
                         onCheckedChange = { rememberMe = it },
                         colors = CheckboxDefaults.colors(
-                            checkedColor = Color.Blue,
+                            checkedColor = Color(0xFF0A84FF),
                             checkmarkColor = Color.White
                         )
                     )
@@ -159,9 +195,13 @@ fun RestoLoginBody(innerPadding: PaddingValues) {
 
                 Text(
                     text = "Forget Password",
-                    modifier = Modifier.clickable { /* TODO */ },
+                    modifier = Modifier.clickable {
+                        val intent = Intent(context, ForgetPasswordActivity::class.java)
+                        context.startActivity(intent)
+                    },
                     color = Color(0xFF0A84FF)
                 )
+
             }
         }
 
@@ -170,6 +210,22 @@ fun RestoLoginBody(innerPadding: PaddingValues) {
         item {
             Button(
                 onClick = {
+
+                    var hasError = false
+
+                    if (email.isBlank()) {
+                        emailError = "Email is required"
+                        hasError = true
+                    }
+
+                    if (password.isBlank()) {
+                        passwordError = "Password is required"
+                        hasError = true
+                    }
+
+                    if (hasError) return@Button
+
+
                     if (email == adminEmail && password == adminPassword) {
                         val intent = Intent(context, AdminDashboardActivityResto::class.java)
                         context.startActivity(intent)

@@ -14,18 +14,20 @@ import androidx.compose.ui.platform.LocalContext
 
 
 private val LightColors = lightColorScheme(
-    background = Color.White,
-    surface = Color.White,
-    onBackground = Color.Black,
+    background = Color(0xFFFFFFFF), // Or white if you want it always white
+    surface = Color(0xFFFFFFFF),
+    onBackground = Color.White,
     onSurface = Color.White
+
 )
 
 private val DarkColors = darkColorScheme(
-    background = Color(0xFF121212), // Or white if you want it always white
-    surface = Color(0xFF1E1E1E),
+    background = Color.White,
+    surface = Color.White,
     onBackground = Color.White,
     onSurface = Color.White
 )
+
 
 
 @Composable

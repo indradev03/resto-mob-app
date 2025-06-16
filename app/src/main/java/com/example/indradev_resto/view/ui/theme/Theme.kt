@@ -13,8 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColors = lightColorScheme(
-    background = Color(0xFF121212), // Or white if you want it always white
-    surface = Color(0xFF1E1E1E),
+    background = Color(0xFFFFFFFF), // Or white if you want it always white
+    surface = Color(0xFFFFFFFF),
     onBackground = Color.White,
     onSurface = Color.White
 
@@ -23,8 +23,8 @@ private val LightColors = lightColorScheme(
 private val DarkColors = darkColorScheme(
     background = Color.White,
     surface = Color.White,
-    onBackground = Color.Black,
-    onSurface = Color.Black
+    onBackground = Color.White,
+    onSurface = Color.White
 )
 
 @Composable

@@ -19,7 +19,7 @@
       </SelectionState>
       <SelectionState runConfigName="SplashActivityResto (2)">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-06-15T05:02:19.678619Z">
+        <DropdownSelection timestamp="2025-06-16T12:05:42.693187800Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=RZ8W80D8ZPL" />

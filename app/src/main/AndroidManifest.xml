@@ -23,6 +23,17 @@
         android:theme="@style/Theme.Indradev_RESTO"
         tools:targetApi="31">
         <activity
+            android:name=".view.ForgetPasswordActivity"
+            android:exported="true"
+            android:label="@string/title_activity_forget_password"
+            android:theme="@style/Theme.Indradev_RESTO">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".view.MainActivity"
             android:exported="true"
             android:label="@string/title_activity_main"
@@ -58,9 +69,9 @@
         <activity
             android:name=".view.LoginActivityResto"
             android:exported="true"
-            android:windowSoftInputMode="adjustResize"
             android:label="@string/title_activity_login_resto"
-            android:theme="@style/Theme.Indradev_RESTO" /> <!-- Registration Activity -->
+            android:theme="@style/Theme.Indradev_RESTO"
+            android:windowSoftInputMode="adjustResize" /> <!-- Registration Activity -->
         <activity
             android:name=".view.RegistrationActivityResto"
             android:exported="true"

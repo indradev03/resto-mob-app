@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
@@ -49,18 +50,17 @@ class RegistrationActivityResto : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Indradev_RESTOTheme {
-                Scaffold { innerPadding ->
-                    RestoRegistrationBody(innerPadding)
-                }
+                RestoRegistrationBody() // No need to pass innerPadding now
             }
         }
-
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RestoRegistrationBody(innerPadding: PaddingValues) {
+fun RestoRegistrationBody() {
+
     val context = LocalContext.current
     val repository = remember { UserRepositoryImpl() }
     val userViewModel = remember { UserViewModel(repository) }
@@ -119,38 +119,39 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
     // Animate changes for the whole form content
     val transition = updateTransition(targetState = rememberMe, label = "rememberMeTransition")
 
+
+    // Scaffold now wraps LazyColumn with TopAppBar
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Registration") },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        activity?.finish()
+                        activity?.overridePendingTransition(
+                            android.R.anim.fade_in,
+                            android.R.anim.fade_out
+                        )
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color(0xFF0A84FF)
+                        )
+                    }
+                }
+            )
+        },
+    ) { innerPadding ->
     LazyColumn(
         modifier = Modifier
             .padding(innerPadding)
             .fillMaxSize()
             .imePadding() // makes space for keyboard
             .background(Color.White),
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(top = 0.dp, start = 25.dp, end = 25.dp, bottom= 0.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                IconButton(
-                    onClick = {
-                        activity?.finish()
-                        activity?.overridePendingTransition(
-                            android.R.anim.fade_in,
-                            android.R.anim.fade_out
-                        )
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color(0xFF0A84FF)
-                    )
-                }
-            }
-        }
-
 
         item {
             Box(
@@ -160,7 +161,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Register",
+                    text = "Sign Up",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF222222), // Dark gray text
@@ -643,5 +644,6 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
             }
         }
     }
+}
 }
 
