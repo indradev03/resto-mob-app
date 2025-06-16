@@ -75,19 +75,22 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
     val context = LocalContext.current
-    val calendar = Calendar.getInstance()
-    val year = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH)
-    val day = calendar.get(Calendar.DAY_OF_MONTH)
-    var selectedDate by remember { mutableStateOf("DOB") }
+
+    var selectedDate by remember { mutableStateOf("") }
 
     var selectedGender by remember { mutableStateOf("Male") }
     var rememberMe by remember { mutableStateOf(false) }
 
+    val calendar = Calendar.getInstance()
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH)
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+
     val datePickerDialog = DatePickerDialog(
         context,
-        { _, selectedYear, selectedMonth, selectedDay ->
-            selectedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+        { _, selectedYear, selectedMonth, selectedDayOfMonth ->
+            selectedDate = "$selectedDayOfMonth/${selectedMonth + 1}/$selectedYear"
+            showDateError = false // clear error on selection
         },
         year, month, day
     )
@@ -271,7 +274,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
         }
 
         item {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -280,15 +283,14 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                             indication = null
                         ) {
                             datePickerDialog.show()
-                            showDateError = false // clear error on click
                         }
                 ) {
                     OutlinedTextField(
                         value = selectedDate,
                         onValueChange = {},
                         enabled = false,
-                        shape = RoundedCornerShape(12.dp),
                         placeholder = { Text("DOB", color = Color.Gray) },
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth(),
                         colors = outlinedTextFieldColors(
                             disabledTextColor = Color.Black,
@@ -308,6 +310,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                 }
             }
         }
+
 
 
 
@@ -376,8 +379,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
             Button(
                 onClick = {
                     // Input validation
-                    if (email.isBlank() || password.isBlank() || firstName.isBlank() || lastName.isBlank() ||
-                        selectedOptionText.isBlank() || selectedDate.isBlank() || selectedGender.isBlank()
+                    if (email.isBlank() || password.isBlank() || firstName.isBlank() || lastName.isBlank()
                     ) {
                         Toast.makeText(context, "Please fill in all required fields", Toast.LENGTH_LONG).show()
                         return@Button
@@ -391,13 +393,12 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                     }
 
 
-                    if (selectedDate.isBlank()) {
+                    if (selectedDate.isEmpty()) {
                         showDateError = true
                         Toast.makeText(context, "Please select your Date of Birth", Toast.LENGTH_LONG).show()
                         return@Button
-                    } else {
-                        showDateError = false
                     }
+
 
                     // Proceed with registration if all fields are valid
                     showError = false // clear error
