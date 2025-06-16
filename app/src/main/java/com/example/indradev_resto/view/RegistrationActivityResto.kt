@@ -81,8 +81,9 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
 
 
     var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf("Select Country") }
-    val options = listOf("Nepal", "USA", "New Zealand")
+    var selectedOptionText by remember { mutableStateOf("") }
+    val options = listOf("Nepal", "USA", "New Zealand" , "Australia" ,"Germany")
+    var showOptionError by remember { mutableStateOf(false) }
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
 
@@ -307,48 +308,62 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
 
 
         item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expanded = true }
-            ) {
-                OutlinedTextField(
-                    value = selectedOptionText,
-                    onValueChange = {},
-                    enabled = false,
-                    shape = RoundedCornerShape(12.dp),
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null,
-                            tint = Color(0xFF0A84FF)
-                        )
-                    },
-                    colors = outlinedTextFieldColors(
-                        disabledTextColor = Color.Black,
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.2f),
-                        disabledBorderColor = Color.Gray.copy(alpha = 0.3f)
-                    ),
+            Column {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .onGloballyPositioned { coordinates ->
-                            textFieldSize = coordinates.size.toSize()
-                        }
-                )
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
+                        .clickable { expanded = true }
                 ) {
-                    options.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option, color = Color.White) },
-                            onClick = {
-                                selectedOptionText = option
-                                expanded = false
+                    OutlinedTextField(
+                        value = selectedOptionText,
+                        onValueChange = {},
+                        enabled = false,
+                        placeholder = { Text("Select your Country", color = Color.Gray) },
+                        shape = RoundedCornerShape(12.dp),
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = null,
+                                tint = Color(0xFF0A84FF)
+                            )
+                        },
+                        isError = showOptionError,
+                        colors = outlinedTextFieldColors(
+                            disabledTextColor = Color.Black,
+                            disabledContainerColor = Color.Gray.copy(alpha = 0.2f),
+                            disabledBorderColor = if (showOptionError) Color.Red else Color.Gray.copy(alpha = 0.3f)
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onGloballyPositioned { coordinates ->
+                                textFieldSize = coordinates.size.toSize()
                             }
-                        )
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
+                    ) {
+                        options.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option, color = Color.White) },
+                                onClick = {
+                                    selectedOptionText = option
+                                    showOptionError = false  // Clear error on selection
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
+                }
+
+                if (showOptionError) {
+                    Text(
+                        text = "Please select a country",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                    )
                 }
             }
         }
@@ -501,12 +516,9 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                         passwordErrorMessage = ""
                     }
 
-
-
-                    // Checkbox validation
-                    if (!rememberMe) {
-                        showError = true
-                        Toast.makeText(context, "Please accept the terms and conditions", Toast.LENGTH_LONG).show()
+                    if (selectedOptionText.trim().isEmpty()) {
+                        showOptionError = true
+                        Toast.makeText(context, "Please select a country", Toast.LENGTH_LONG).show()
                         return@Button
                     }
 
@@ -516,6 +528,15 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                         Toast.makeText(context, "Please select your Date of Birth", Toast.LENGTH_LONG).show()
                         return@Button
                     }
+
+
+                    // Checkbox validation
+                    if (!rememberMe) {
+                        showError = true
+                        Toast.makeText(context, "Please accept the terms and conditions", Toast.LENGTH_LONG).show()
+                        return@Button
+                    }
+
 
                     // Proceed with registration if all fields are valid
                     showError = false // clear error
