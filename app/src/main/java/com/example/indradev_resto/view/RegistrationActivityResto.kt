@@ -162,6 +162,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
             )
         }
 
+        //first name and last name
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -229,10 +230,13 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
             }
         }
 
+
+
         fun isValidEmail(email: String): Boolean {
             return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
         }
 
+        //email
         item {
             Column {
                 OutlinedTextField(
@@ -245,7 +249,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                             tint = Color(0xFF0A84FF)
                         )
                     },
-                    placeholder = { Text("Email", color = Color.Gray) },
+                    placeholder = { Text("Email", color = Color.Black) },
                     value = email,
                     onValueChange = {
                         email = it
@@ -254,7 +258,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                     isError = showEmailError,
                     colors = outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF0A84FF),
-                        unfocusedBorderColor = if (showEmailError) Color.Red else Color.Gray.copy(alpha = 0.3f),
+                        unfocusedBorderColor = if (showEmailError) Color.Red else Color.Black.copy(alpha = 0.3f),
                         errorBorderColor = Color.Red,
                         focusedLabelColor = Color(0xFF0A84FF),
                         cursorColor = Color(0xFF0A84FF),
@@ -274,6 +278,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
         }
 
 
+        //password
         item {
             Column {
                 OutlinedTextField(
@@ -286,7 +291,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                             tint = Color(0xFF0A84FF)
                         )
                     },
-                    placeholder = { Text("Password", color = Color.Gray) },
+                    placeholder = { Text("Password", color = Color.Black) },
                     value = password,
                     onValueChange = {
                         password = it
@@ -295,7 +300,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                     isError = showPasswordError,
                     colors = outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF0A84FF),
-                        unfocusedBorderColor = if (showPasswordError) Color.Red else Color.Gray.copy(alpha = 0.3f),
+                        unfocusedBorderColor = if (showPasswordError) Color.Red else Color.Black.copy(alpha = 0.3f),
                         errorBorderColor = Color.Red,
                         focusedLabelColor = Color(0xFF0A84FF),
                         cursorColor = Color(0xFF0A84FF),
@@ -315,6 +320,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
         }
 
 
+        // Country
         item {
             Column {
                 Box(
@@ -326,7 +332,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                         value = selectedOptionText,
                         onValueChange = {},
                         enabled = false,
-                        placeholder = { Text("Select your Country", color = Color.Gray) },
+                        placeholder = { Text("Select your Country", color = Color.Black) },
                         shape = RoundedCornerShape(12.dp),
                         trailingIcon = {
                             Icon(
@@ -338,8 +344,8 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                         isError = showOptionError,
                         colors = outlinedTextFieldColors(
                             disabledTextColor = Color.Black,
-                            disabledContainerColor = Color.Gray.copy(alpha = 0.2f),
-                            disabledBorderColor = if (showOptionError) Color.Red else Color.Gray.copy(alpha = 0.3f)
+                            disabledContainerColor = Color.White, // ← White background
+                            disabledBorderColor = if (showOptionError) Color.Red else Color.Black.copy(alpha = 0.3f)
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -377,6 +383,8 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
         }
 
 
+
+        //DOB
         item {
             Column {
                 Box(
@@ -393,13 +401,13 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                         value = selectedDate,
                         onValueChange = {},
                         enabled = false,
-                        placeholder = { Text("DOB", color = Color.Gray) },
+                        placeholder = { Text("DOB", color = Color.Black) },
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth(),
                         colors = outlinedTextFieldColors(
                             disabledTextColor = Color.Black,
-                            disabledContainerColor = Color.Gray.copy(alpha = 0.2f),
-                            disabledBorderColor = if (showDateError) Color.Red else Color.Gray.copy(alpha = 0.3f)
+                            disabledContainerColor = Color.White, // ← White background
+                            disabledBorderColor = if (showDateError) Color.Red else Color.Black.copy(alpha = 0.3f)
                         )
                     )
                 }
@@ -416,8 +424,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
         }
 
 
-
-
+        //GENDER
         item {
             Text(
                 text = "Gender",
@@ -467,6 +474,8 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
         }
 
 
+
+        //Terms and condition
         item {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row(
@@ -535,9 +544,9 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                     if (password.isEmpty()) {
                         showPasswordError = true
                         passwordErrorMessage = "Password is required"
-                    } else if (password.length < 8) {
+                    } else if (password.length < 6) {
                         showPasswordError = true
-                        passwordErrorMessage = "Password must be at least 8 characters"
+                        passwordErrorMessage = "Password must be at least 6 characters"
                     } else {
                         showPasswordError = false
                         passwordErrorMessage = ""
@@ -545,17 +554,14 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
 
                     if (selectedOptionText.trim().isEmpty()) {
                         showOptionError = true
-                        Toast.makeText(context, "Please select a country", Toast.LENGTH_LONG).show()
                         return@Button
                     }
 
 
                     if (selectedDate.isEmpty()) {
                         showDateError = true
-                        Toast.makeText(context, "Please select your Date of Birth", Toast.LENGTH_LONG).show()
                         return@Button
                     }
-
 
                     // GENDER
                     if (selectedGender.isEmpty()) {
@@ -568,10 +574,8 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                     // Checkbox validation
                     if (!rememberMe) {
                         showError = true
-                        Toast.makeText(context, "Please accept the terms and conditions", Toast.LENGTH_LONG).show()
                         return@Button
                     }
-
 
                     if (hasError) {
                         Toast.makeText(context, "All fields are empty", Toast.LENGTH_SHORT).show()
