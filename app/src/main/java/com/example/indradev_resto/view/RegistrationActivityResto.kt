@@ -76,6 +76,9 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
     var emailErrorMessage by remember { mutableStateOf("") }
 
     var password by remember { mutableStateOf("") }
+    var showPasswordError by remember { mutableStateOf(false) }
+    var passwordErrorMessage by remember { mutableStateOf("") }
+
 
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf("Select Country") }
@@ -263,28 +266,45 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
 
 
         item {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                prefix = {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_password_24),
-                        contentDescription = null,
-                        tint = Color(0xFF0A84FF)
+            Column {
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_password_24),
+                            contentDescription = null,
+                            tint = Color(0xFF0A84FF)
+                        )
+                    },
+                    placeholder = { Text("Password", color = Color.Gray) },
+                    value = password,
+                    onValueChange = {
+                        password = it
+                        showPasswordError = false // Clear error on typing
+                    },
+                    isError = showPasswordError,
+                    colors = outlinedTextFieldColors(
+                        focusedBorderColor = Color(0xFF0A84FF),
+                        unfocusedBorderColor = if (showPasswordError) Color.Red else Color.Gray.copy(alpha = 0.3f),
+                        errorBorderColor = Color.Red,
+                        focusedLabelColor = Color(0xFF0A84FF),
+                        cursorColor = Color(0xFF0A84FF),
+                        focusedTextColor = Color(0xFF222222),
+                        unfocusedTextColor = Color(0xFF222222),
                     )
-                },
-                placeholder = { Text("Password", color = Color.Gray) },
-                value = password,
-                onValueChange = { password = it },
-                colors = outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF0A84FF),
-                    focusedLabelColor = Color(0xFF0A84FF),
-                    cursorColor = Color(0xFF0A84FF),
-                    focusedTextColor = Color(0xFF222222),
-                    unfocusedTextColor = Color(0xFF222222),
                 )
-            )
+                if (showPasswordError) {
+                    Text(
+                        text = passwordErrorMessage,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                    )
+                }
+            }
         }
+
 
         item {
             Box(
@@ -469,6 +489,18 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                         showEmailError = false
                         emailErrorMessage = ""
                     }
+
+                    if (password.isEmpty()) {
+                        showPasswordError = true
+                        passwordErrorMessage = "Password is required"
+                    } else if (password.length < 8) {
+                        showPasswordError = true
+                        passwordErrorMessage = "Password must be at least 8 characters"
+                    } else {
+                        showPasswordError = false
+                        passwordErrorMessage = ""
+                    }
+
 
 
                     // Checkbox validation
