@@ -60,13 +60,21 @@ class RegistrationActivityResto : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestoRegistrationBody(innerPadding: PaddingValues) {
+    val context = LocalContext.current
     val repository = remember { UserRepositoryImpl() }
     val userViewModel = remember { UserViewModel(repository) }
     var showError by remember { mutableStateOf(false) }
-    var showDateError by remember { mutableStateOf(false) }
+
+
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
+    var showFirstNameError by remember { mutableStateOf(false) }
+    var showLastNameError by remember { mutableStateOf(false) }
+
     var email by remember { mutableStateOf("") }
+    var showEmailError by remember { mutableStateOf(false) }
+    var emailErrorMessage by remember { mutableStateOf("") }
+
     var password by remember { mutableStateOf("") }
 
     var expanded by remember { mutableStateOf(false) }
@@ -74,10 +82,9 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
     val options = listOf("Nepal", "USA", "New Zealand")
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
-    val context = LocalContext.current
+
 
     var selectedDate by remember { mutableStateOf("") }
-
     var selectedGender by remember { mutableStateOf("Male") }
     var rememberMe by remember { mutableStateOf(false) }
 
@@ -85,7 +92,7 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
     val year = calendar.get(Calendar.YEAR)
     val month = calendar.get(Calendar.MONTH)
     val day = calendar.get(Calendar.DAY_OF_MONTH)
-
+    var showDateError by remember { mutableStateOf(false) }
     val datePickerDialog = DatePickerDialog(
         context,
         { _, selectedYear, selectedMonth, selectedDayOfMonth ->
@@ -148,59 +155,112 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                OutlinedTextField(
-                    value = firstName,
-                    onValueChange = { firstName = it },
-                    label = { Text("First Name", color = Color(0xFF444444)) },
-                    modifier = Modifier.weight(1f),
-                    colors = outlinedTextFieldColors(
-                        focusedBorderColor = Color(0xFF0A84FF),
-                        focusedLabelColor = Color(0xFF0A84FF),
-                        cursorColor = Color(0xFF0A84FF),
-                        focusedTextColor = Color(0xFF222222),
-                        unfocusedTextColor = Color(0xFF222222),
+                Column(modifier = Modifier.weight(1f)) {
+                    OutlinedTextField(
+                        value = firstName,
+                        onValueChange = {
+                            firstName = it
+                            showFirstNameError = false // clear error on typing
+                        },
+                        label = { Text("First Name", color = Color(0xFF444444)) },
+                        isError = showFirstNameError,
+                        colors = outlinedTextFieldColors(
+                            focusedBorderColor = Color(0xFF0A84FF),
+                            unfocusedBorderColor = if (showFirstNameError) Color.Red else Color.Gray,
+                            errorBorderColor = Color.Red,
+                            focusedLabelColor = Color(0xFF0A84FF),
+                            cursorColor = Color(0xFF0A84FF),
+                            focusedTextColor = Color(0xFF222222),
+                            unfocusedTextColor = Color(0xFF222222),
+                        ),
+                        modifier = Modifier.fillMaxWidth()
                     )
-                )
+                    if (showFirstNameError) {
+                        Text(
+                            text = "First name is required",
+                            color = Color.Red,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 8.dp, top = 2.dp)
+                        )
+                    }
+                }
 
-                OutlinedTextField(
-                    value = lastName,
-                    onValueChange = { lastName = it },
-                    label = { Text("Last Name", color = Color(0xFF444444)) },
-                    modifier = Modifier.weight(1f),
-                    colors = outlinedTextFieldColors(
-                        focusedBorderColor = Color(0xFF0A84FF),
-                        focusedLabelColor = Color(0xFF0A84FF),
-                        cursorColor = Color(0xFF0A84FF),
-                        focusedTextColor = Color(0xFF222222),
-                        unfocusedTextColor = Color(0xFF222222),
+                Column(modifier = Modifier.weight(1f)) {
+                    OutlinedTextField(
+                        value = lastName,
+                        onValueChange = {
+                            lastName = it
+                            showLastNameError = false
+                        },
+                        label = { Text("Last Name", color = Color(0xFF444444)) },
+                        isError = showLastNameError,
+                        colors = outlinedTextFieldColors(
+                            focusedBorderColor = Color(0xFF0A84FF),
+                            unfocusedBorderColor = if (showLastNameError) Color.Red else Color.Gray,
+                            errorBorderColor = Color.Red,
+                            focusedLabelColor = Color(0xFF0A84FF),
+                            cursorColor = Color(0xFF0A84FF),
+                            focusedTextColor = Color(0xFF222222),
+                            unfocusedTextColor = Color(0xFF222222),
+                        ),
+                        modifier = Modifier.fillMaxWidth()
                     )
-                )
+                    if (showLastNameError) {
+                        Text(
+                            text = "Last name is required",
+                            color = Color.Red,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 8.dp, top = 2.dp)
+                        )
+                    }
+                }
             }
         }
 
-        item {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                prefix = {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_email_24),
-                        contentDescription = null,
-                        tint = Color(0xFF0A84FF)
-                    )
-                },
-                placeholder = { Text("Email", color = Color.Gray) },
-                value = email,
-                onValueChange = { email = it },
-                colors = outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF0A84FF),
-                    focusedLabelColor = Color(0xFF0A84FF),
-                    cursorColor = Color(0xFF0A84FF),
-                    focusedTextColor = Color(0xFF222222),
-                    unfocusedTextColor = Color(0xFF222222),
-                )
-            )
+        fun isValidEmail(email: String): Boolean {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
         }
+
+        item {
+            Column {
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    leadingIcon = {   // Use leadingIcon, not prefix
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_email_24),
+                            contentDescription = null,
+                            tint = Color(0xFF0A84FF)
+                        )
+                    },
+                    placeholder = { Text("Email", color = Color.Gray) },
+                    value = email,
+                    onValueChange = {
+                        email = it
+                        showEmailError = false  // clear error while typing
+                    },
+                    isError = showEmailError,
+                    colors = outlinedTextFieldColors(
+                        focusedBorderColor = Color(0xFF0A84FF),
+                        unfocusedBorderColor = if (showEmailError) Color.Red else Color.Gray.copy(alpha = 0.3f),
+                        errorBorderColor = Color.Red,
+                        focusedLabelColor = Color(0xFF0A84FF),
+                        cursorColor = Color(0xFF0A84FF),
+                        focusedTextColor = Color(0xFF222222),
+                        unfocusedTextColor = Color(0xFF222222),
+                    )
+                )
+                if (showEmailError) {
+                    Text(
+                        text = emailErrorMessage,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                    )
+                }
+            }
+        }
+
 
         item {
             OutlinedTextField(
@@ -378,12 +438,38 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
-                    // Input validation
-                    if (email.isBlank() || password.isBlank() || firstName.isBlank() || lastName.isBlank()
-                    ) {
-                        Toast.makeText(context, "Please fill in all required fields", Toast.LENGTH_LONG).show()
+                    var hasError = false
+
+                    if (firstName.trim().isEmpty()) {
+                        showFirstNameError = true
+                        hasError = true
+                    } else {
+                        showFirstNameError = false
+                    }
+
+                    if (lastName.trim().isEmpty()) {
+                        showLastNameError = true
+                        hasError = true
+                    } else {
+                        showLastNameError = false
+                    }
+
+                    if (hasError) {
+                        Toast.makeText(context, "Please correct the errors", Toast.LENGTH_SHORT).show()
                         return@Button
                     }
+
+                    if (email.trim().isEmpty()) {
+                        showEmailError = true
+                        emailErrorMessage = "Email is required"
+                    } else if (!isValidEmail(email.trim())) {
+                        showEmailError = true
+                        emailErrorMessage = "Please enter a valid email address"
+                    } else {
+                        showEmailError = false
+                        emailErrorMessage = ""
+                    }
+
 
                     // Checkbox validation
                     if (!rememberMe) {
@@ -399,10 +485,8 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                         return@Button
                     }
 
-
                     // Proceed with registration if all fields are valid
                     showError = false // clear error
-
 
 
                     userViewModel.register(email, password) { success, message, userId ->
