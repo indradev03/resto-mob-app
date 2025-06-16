@@ -153,14 +153,22 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
 
 
         item {
-            Text(
-                text = "Register",
-                fontSize = 30.sp,
-                color = Color(0xFF222222), // Darker text color for headings
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.headlineMedium
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp), // Add some vertical spacing
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Register",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF222222), // Dark gray text
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+            }
         }
+
 
         //first name and last name
         item {
