@@ -62,7 +62,8 @@ class RegistrationActivityResto : ComponentActivity() {
 fun RestoRegistrationBody(innerPadding: PaddingValues) {
     val repository = remember { UserRepositoryImpl() }
     val userViewModel = remember { UserViewModel(repository) }
-
+    var showError by remember { mutableStateOf(false) }
+    var showDateError by remember { mutableStateOf(false) }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -270,31 +271,45 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
         }
 
         item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) {
-                        datePickerDialog.show()
-                    }
-            ) {
-                OutlinedTextField(
-                    value = selectedDate,
-                    onValueChange = {},
-                    enabled = false,
-                    shape = RoundedCornerShape(12.dp),
-                    placeholder = { Text("DOB", color = Color.Gray) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = outlinedTextFieldColors(
-                        disabledTextColor = Color.Black,
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.2f),
-                        disabledBorderColor = Color.Gray.copy(alpha = 0.3f)
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            datePickerDialog.show()
+                            showDateError = false // clear error on click
+                        }
+                ) {
+                    OutlinedTextField(
+                        value = selectedDate,
+                        onValueChange = {},
+                        enabled = false,
+                        shape = RoundedCornerShape(12.dp),
+                        placeholder = { Text("DOB", color = Color.Gray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = outlinedTextFieldColors(
+                            disabledTextColor = Color.Black,
+                            disabledContainerColor = Color.Gray.copy(alpha = 0.2f),
+                            disabledBorderColor = if (showDateError) Color.Red else Color.Gray.copy(alpha = 0.3f)
+                        )
                     )
-                )
+                }
+
+                if (showDateError) {
+                    Text(
+                        text = "Please select your Date of Birth",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                    )
+                }
             }
         }
+
+
 
         item {
             Text(text = "Gender", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, color = Color(0xFF222222))
@@ -324,27 +339,71 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
         }
 
         item {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Checkbox(
-                    checked = rememberMe,
-                    onCheckedChange = { rememberMe = it },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = Color(0xFF0A84FF),
-                        checkmarkColor = Color.White
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Checkbox(
+                        checked = rememberMe,
+                        onCheckedChange = {
+                            rememberMe = it
+                            if (it) showError = false
+                        },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = Color(0xFF0A84FF),
+                            checkmarkColor = Color.White
+                        )
                     )
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "I accept terms and condition", color = Color(0xFF222222))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "I accept terms and condition", color = Color(0xFF222222))
+                }
+
+                if (showError && !rememberMe) {
+                    Text(
+                        text = "You must accept the terms and conditions",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                    )
+                }
             }
         }
+
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
+                    // Input validation
+                    if (email.isBlank() || password.isBlank() || firstName.isBlank() || lastName.isBlank() ||
+                        selectedOptionText.isBlank() || selectedDate.isBlank() || selectedGender.isBlank()
+                    ) {
+                        Toast.makeText(context, "Please fill in all required fields", Toast.LENGTH_LONG).show()
+                        return@Button
+                    }
+
+                    // Checkbox validation
+                    if (!rememberMe) {
+                        showError = true
+                        Toast.makeText(context, "Please accept the terms and conditions", Toast.LENGTH_LONG).show()
+                        return@Button
+                    }
+
+
+                    if (selectedDate.isBlank()) {
+                        showDateError = true
+                        Toast.makeText(context, "Please select your Date of Birth", Toast.LENGTH_LONG).show()
+                        return@Button
+                    } else {
+                        showDateError = false
+                    }
+
+                    // Proceed with registration if all fields are valid
+                    showError = false // clear error
+
+
+
                     userViewModel.register(email, password) { success, message, userId ->
                         if (success) {
                             val model = UserModel(
@@ -371,6 +430,8 @@ fun RestoRegistrationBody(innerPadding: PaddingValues) {
                 Text("Register", color = Color.White)
             }
         }
+
+
 
         item {
             Spacer(modifier = Modifier.height(10.dp))
