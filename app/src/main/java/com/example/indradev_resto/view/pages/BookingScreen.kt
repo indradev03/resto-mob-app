@@ -126,7 +126,7 @@ fun TableBookingCard(table: TableModel, onBook: (TableModel) -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White) // ✅ White background here
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF2F6F6)) // ✅ White background here
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(

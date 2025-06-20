@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.indradev_resto.model.OrderModel
@@ -57,12 +58,6 @@ fun AdminOrdersScreen() {
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("📋 All Bookings") },
-                modifier = Modifier.padding(top = 0.dp)
-            )
-        },
         // Disable system window insets padding to remove extra top space
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { padding ->
@@ -70,6 +65,7 @@ fun AdminOrdersScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .background(Color.White)
         ) {
             when {
                 isLoading -> {
@@ -85,21 +81,36 @@ fun AdminOrdersScreen() {
                 }
 
                 else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
                     ) {
-                        items(orders) { order ->
-                            OrderItem(
-                                order = order,
-                                onDeleteRequest = { orderToDelete = it }
-                            )
+                        Text(
+                            text = "📋 All Bookings",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            ),
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(orders) { order ->
+                                OrderItem(
+                                    order = order,
+                                    onDeleteRequest = { orderToDelete = it }
+                                )
+                            }
                         }
                     }
                 }
             }
         }
+
     }
 }
 
@@ -108,8 +119,8 @@ fun OrderItem(order: OrderModel, onDeleteRequest: (OrderModel) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF2F6F6)), // Set background to white
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp) // Increase elevation for shadow
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 

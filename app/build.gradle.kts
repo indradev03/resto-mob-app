@@ -60,16 +60,26 @@ dependencies {
 
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
+
+// Image upload with Cloudinary
+    implementation("com.cloudinary:cloudinary-android:2.1.0")
+
+// Image loading (Picasso)
+    implementation("com.squareup.picasso:picasso:2.8")
+
+// Image loading (Coil for Jetpack Compose)
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
     // Firebase
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
 
     // 📷 Coil for image loading
-    implementation("io.coil-kt:coil-compose:2.2.2")
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.androidx.room.common.jvm)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.storage.ktx)
 
     // ✅ (Optional): Remove duplicate hardcoded activity-compose if using libs. Already declared:
     // implementation("androidx.activity:activity-compose:1.7.2")

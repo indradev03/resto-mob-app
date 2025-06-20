@@ -5,10 +5,13 @@ import DashboardScreen
 import HelpScreen
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -71,6 +75,14 @@ fun RestoNavigationBody() {
         BottomNavItem("Profile", Icons.Default.Person)
     )
 
+    var selectedImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedImageUri = uri
+    }
+
     var selectedIndex by remember { mutableStateOf(0) }
     val context = LocalContext.current
 
@@ -101,18 +113,21 @@ fun RestoNavigationBody() {
                     1 -> MenuScreen()
                     2 -> BookingScreen(tableViewModel, bookingViewModel)
                     3 -> ProfileScreen(
-                        onEditClick = {
-                            selectedIndex = 4 // Navigate to EditProfileScreen
-                        }
+                        selectedImageUri = selectedImageUri,
+                        onPickImage = { launcher.launch("image/*") },
+                        onEditClick = { selectedIndex = 4 },
+                        setSelectedImageUri = { uri -> selectedImageUri = uri },
+                        userViewModel = userViewModel
                     )
                     4 -> EditProfileScreen(
                         userViewModel = userViewModel,
                         onBack = {
-                            selectedIndex = 3 // Back to ProfileScreen
+                            selectedIndex = 3
                         }
                     )
                     5 -> HelpScreen(onBack = { selectedIndex = 0 })
                 }
+
             }
         }
     }
@@ -124,7 +139,7 @@ fun RestoBottomNavigationBar(
     onItemSelected: (Int) -> Unit
 ) {
     val navItems = listOf(
-        BottomNavItem("Dashboard", Icons.Default.Home),
+        BottomNavItem("Home", Icons.Default.Home),
         BottomNavItem("Our Menu", Icons.Default.RestaurantMenu),
         BottomNavItem("Tables", Icons.Default.TableRestaurant),
         BottomNavItem("Profile", Icons.Default.Person)
@@ -191,14 +206,6 @@ fun TopNavigationBar(onNavigateTo: (Int) -> Unit) {
         ) {
             Spacer(modifier = Modifier.weight(1f))
 
-            ImageButton(
-                imageRes = R.drawable.user,
-                description = "Profile",
-                modifier = Modifier.size(48.dp),
-                backgroundColor = Color(0xFFF0F0F0)
-            ) {
-                onNavigateTo(3)
-            }
 
             Spacer(modifier = Modifier.width(12.dp))
 

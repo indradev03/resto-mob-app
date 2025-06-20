@@ -11,6 +11,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,10 +40,12 @@ fun AdminUsersScreen() {
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)) {
-
         Text(
-            text = "👥 Manage Users",
-            style = MaterialTheme.typography.headlineMedium,
+            text = "\uD83D\uDC65 Manage Users",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            ),
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
@@ -51,7 +54,7 @@ fun AdminUsersScreen() {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF2F6F6)),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
 

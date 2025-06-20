@@ -1,3 +1,4 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,6 +16,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.LayoutDirection
@@ -59,20 +61,34 @@ fun AdminTablesScreen(tableViewModel: TableViewModel) {
 
         Column(
             modifier = Modifier
-                .padding(safePadding)
-                .padding(12.dp)
                 .fillMaxSize()
+                .background(Color.White)
+                .padding(16.dp)
         ) {
-            Text("🪑 Manage Tables", fontSize = 24.sp, style = MaterialTheme.typography.headlineSmall)
-
-            Spacer(Modifier.height(20.dp))
+            Text(
+                text = "🪑 Manage Tables",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                ),
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
 
             if (loading) {
-                CircularProgressIndicator()
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             } else if (tables.isEmpty()) {
-                Text("No tables available. $message")
+                Text(
+                    text = "No tables available. $message",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
             } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
                     items(tables) { table ->
                         TableItem(
                             table = table,
@@ -93,6 +109,7 @@ fun AdminTablesScreen(tableViewModel: TableViewModel) {
                 }
             }
         }
+
 
         if (showDialog) {
             TableDialog(
@@ -130,7 +147,7 @@ fun TableItem(
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White), // Set background to white
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF2F6F6)), // Set background to white
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp) // Increase elevation for shadow
     ) {
         Row(

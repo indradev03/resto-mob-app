@@ -4,10 +4,12 @@
     <!-- Permissions (must be outside <application>) -->
     <!-- For reading media (Android 13 / API 33+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" /> <!-- For reading external storage (Android 12 and below) -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- Optional camera hardware declaration -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- For Android 12 and below -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" /> <!-- For taking photos using camera -->
-    <uses-permission android:name="android.permission.CAMERA" /> <!-- Optional camera hardware declaration -->
+        android:maxSdkVersion="32" />
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -21,7 +23,20 @@
         android:roundIcon="@drawable/restologo"
         android:supportsRtl="true"
         android:theme="@style/Theme.Indradev_RESTO"
+        tools:replace="android:fullBackupContent"
         tools:targetApi="31">
+        <activity
+            android:name=".view.ProfileActivity"
+            android:exported="true"
+            android:label="@string/title_activity_profile"
+            android:theme="@style/Theme.Indradev_RESTO"
+            tools:ignore="MissingClass">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".view.ForgetPasswordActivity"
             android:exported="true"
