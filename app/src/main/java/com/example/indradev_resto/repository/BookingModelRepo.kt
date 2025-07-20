@@ -15,5 +15,8 @@ interface BookingModelRepo{
 
     fun deleteBooking(bookingId: String, onResult: (Boolean, String) -> Unit)
 
+    fun getBookingCount(callback: (Boolean, Int) -> Unit)
+
+
 
 }

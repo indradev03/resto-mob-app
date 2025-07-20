@@ -139,4 +139,18 @@ class TableModelRepositoryImpl : TableModelRepository {
             }
         }
     }
+
+    override fun getTableCount(callback: (Boolean, Int) -> Unit) {
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val count = snapshot.childrenCount.toInt()
+                callback(true, count)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(false, 0)
+            }
+        })
+    }
+
 }

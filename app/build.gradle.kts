@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.implementation
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -47,49 +49,48 @@ dependencies {
     // Core Android and Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose) // already defined in libs. No need to duplicate below
+    implementation(libs.androidx.activity.compose) // already defined in libs
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    // ✅ Material Icons Extended
-    implementation("androidx.compose.material:material-icons-extended")
+    // Material Icons Extended
+    implementation("androidx.compose.material:material-icons-extended:1.4.3") // specify version if not in libs
 
+    // Lifecycle ViewModel Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
-
-
-// Image upload with Cloudinary
+    // Image upload with Cloudinary
     implementation("com.cloudinary:cloudinary-android:2.1.0")
 
-// Image loading (Picasso)
+    // Image loading libraries
     implementation("com.squareup.picasso:picasso:2.8")
-
-// Image loading (Coil for Jetpack Compose)
     implementation("io.coil-kt:coil-compose:2.2.2")
 
-    // Firebase
+    // Firebase dependencies
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
-
-    // 📷 Coil for image loading
-    implementation(libs.androidx.runtime.livedata)
     implementation(libs.firebase.crashlytics.buildtools)
-    implementation(libs.androidx.room.common.jvm)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage.ktx)
 
-    // ✅ (Optional): Remove duplicate hardcoded activity-compose if using libs. Already declared:
-    // implementation("androidx.activity:activity-compose:1.7.2")
+    // LiveData runtime (if used)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.room.common.jvm)
 
-    // Testing
+
+    // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    // Debugging tools
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
+
