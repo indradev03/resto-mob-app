@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -195,7 +196,7 @@ fun RestoRegistrationBody() {
                             focusedTextColor = Color(0xFF222222),
                             unfocusedTextColor = Color(0xFF222222),
                         ),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().testTag("firstNameField")
                     )
                     if (showFirstNameError) {
                         Text(
@@ -225,7 +226,7 @@ fun RestoRegistrationBody() {
                             focusedTextColor = Color(0xFF222222),
                             unfocusedTextColor = Color(0xFF222222),
                         ),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().testTag("lastNameField")
                     )
                     if (showLastNameError) {
                         Text(
@@ -249,7 +250,7 @@ fun RestoRegistrationBody() {
         item {
             Column {
                 OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag("emailField"),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     leadingIcon = {   // Use leadingIcon, not prefix
                         Icon(
@@ -291,7 +292,7 @@ fun RestoRegistrationBody() {
         item {
             Column {
                 OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag("passwordField"),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     leadingIcon = {
                         Icon(
@@ -358,6 +359,7 @@ fun RestoRegistrationBody() {
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
+                            .testTag("countryDropdown")
                             .onGloballyPositioned { coordinates ->
                                 textFieldSize = coordinates.size.toSize()
                             }
@@ -365,10 +367,12 @@ fun RestoRegistrationBody() {
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
-                        modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
+                        modifier = Modifier
+                            .width(with(LocalDensity.current) { textFieldSize.width.toDp() })
                     ) {
                         options.forEach { option ->
                             DropdownMenuItem(
+                                modifier = Modifier.testTag("countryOption_$option"), // ✅ Tag each item
                                 text = { Text(option, color = Color.White) },
                                 onClick = {
                                     selectedOptionText = option
@@ -412,7 +416,8 @@ fun RestoRegistrationBody() {
                         enabled = false,
                         placeholder = { Text("DOB", color = Color.Black) },
                         shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth()
+                            .testTag("dobField"),
                         colors = outlinedTextFieldColors(
                             disabledTextColor = Color.Black,
                             disabledContainerColor = Color.White, // ← White background
@@ -449,23 +454,26 @@ fun RestoRegistrationBody() {
                 listOf("Male", "Female", "Other").forEach { gender ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable {
-                            selectedGender = gender
-                            showGenderError = false // clear error on selection
-                        }
+                        modifier = Modifier
+                            .clickable {
+                                selectedGender = gender
+                                showGenderError = false
+                            }
+                            .testTag("genderOption_$gender") // ✅ Unique test tag per gender
                     ) {
                         RadioButton(
                             selected = (selectedGender == gender),
                             onClick = {
                                 selectedGender = if (selectedGender == gender) "" else gender
                                 showGenderError = false
-                                showGenderError = false // clear error on selection
                             },
+                            modifier = Modifier.testTag("radio_$gender"), // ✅ Optional: individual tag
                             colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF0A84FF))
                         )
                         Text(
                             text = gender,
-                            modifier = Modifier.padding(start = 8.dp),
+                            modifier = Modifier
+                                .padding(start = 8.dp),
                             color = Color(0xFF222222)
                         )
                     }
@@ -483,7 +491,6 @@ fun RestoRegistrationBody() {
         }
 
 
-
         //Terms and condition
         item {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -497,6 +504,7 @@ fun RestoRegistrationBody() {
                             rememberMe = it
                             if (it) showError = false
                         },
+                        modifier = Modifier.testTag("termsCheckbox"), // ✅ Add test tag here
                         colors = CheckboxDefaults.colors(
                             checkedColor = Color(0xFF0A84FF),
                             checkmarkColor = Color.White
@@ -516,6 +524,7 @@ fun RestoRegistrationBody() {
                 }
             }
         }
+
 
 
         item {
@@ -613,7 +622,7 @@ fun RestoRegistrationBody() {
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("registerButton"), // ✅ Add test tag here,
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0A84FF))
             ) {

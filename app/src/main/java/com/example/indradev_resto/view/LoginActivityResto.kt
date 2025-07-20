@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -101,7 +102,7 @@ fun RestoLoginBody(innerPadding: PaddingValues) {
         item {
             Column {
                 OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag("loginEmailField"),
                     shape = RoundedCornerShape(12.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     placeholder = { Text(text = "Enter your email", color = Color.Gray) },
@@ -132,7 +133,7 @@ fun RestoLoginBody(innerPadding: PaddingValues) {
         item {
             Column {
                 OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag("loginPasswordField"),
                     shape = RoundedCornerShape(12.dp),
                     visualTransformation = if (!passwordVisibility)
                         PasswordVisualTransformation()
@@ -266,7 +267,7 @@ fun RestoLoginBody(innerPadding: PaddingValues) {
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("loginButton"),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0A84FF))
             ) {
