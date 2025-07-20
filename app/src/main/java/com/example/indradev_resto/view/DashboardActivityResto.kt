@@ -41,6 +41,7 @@ import com.example.indradev_resto.view.ui.theme.Indradev_RESTOTheme
 import com.example.indradev_resto.viewmodel.BookingViewModel
 import com.example.indradev_resto.viewmodel.TableViewModel
 import com.example.indradev_resto.viewmodel.UserViewModel
+import com.google.firebase.database.FirebaseDatabase
 
 class DashboardActivityResto : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +63,10 @@ fun RestoNavigationBody() {
     val repository = remember { UserRepositoryImpl() }
     val userViewModel = remember { UserViewModel(repository) }
 
-    val tableRepository = remember { TableModelRepositoryImpl() }
+    val tableRepository = remember {
+        val databaseRef = FirebaseDatabase.getInstance().reference.child("tables")
+        TableModelRepositoryImpl(databaseRef)
+    }
     val tableViewModel = remember { TableViewModel(tableRepository) }
 
     val bookingRepository = remember { BookingModelRepoImpl() }

@@ -6,10 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import com.example.indradev_resto.model.TableModel
 import com.google.firebase.database.*
 
-class TableModelRepositoryImpl : TableModelRepository {
+class TableModelRepositoryImpl(private val ref: DatabaseReference) : TableModelRepository {
 
-    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-    private val ref: DatabaseReference = database.reference.child("tables")
+    // yolai chai realtime database maa add garne bela un comment garnee ho
+
+//    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+//    val firebaseRef = FirebaseDatabase.getInstance().reference.child("tables")
+//    val repository = TableModelRepositoryImpl(firebaseRef)
+
 
     private val _tableListLiveData = MutableLiveData<List<TableModel>>()
     val tableListLiveData: LiveData<List<TableModel>> = _tableListLiveData
@@ -24,11 +28,9 @@ class TableModelRepositoryImpl : TableModelRepository {
             .setValue(table)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
-                    Log.d("TableRepo", "Table added successfully: ${table.tableId}")
                     callback(true, "Table added successfully")
                 } else {
                     val error = it.exception?.localizedMessage ?: "Failed to add table"
-                    Log.e("TableRepo", error)
                     callback(false, error)
                 }
             }

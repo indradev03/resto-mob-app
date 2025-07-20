@@ -81,6 +81,21 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.room.common.jvm)
 
+    // unit testing
+    testImplementation("org.mockito:mockito-core:5.6.0")
+
+
+    // instrumental testing
+    androidTestImplementation("androidx.test:runner:1.2.0")
+    androidTestImplementation("androidx.test:rules:1.2.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+
+    testImplementation ("org.robolectric:robolectric:4.10.3")
+    testImplementation ("org.mockito:mockito-core:5.2.0")
+    testImplementation ("junit:junit:4.13.2")
+
+
 
     // Testing dependencies
     testImplementation(libs.junit)

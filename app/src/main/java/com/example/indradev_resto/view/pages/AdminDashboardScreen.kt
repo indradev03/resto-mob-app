@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.indradev_resto.repository.TableModelRepositoryImpl
 import com.example.indradev_resto.view.pages.components.AdminBottomNavItem
 import com.example.indradev_resto.viewmodel.TableViewModel
+import com.google.firebase.database.FirebaseDatabase
 
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -21,8 +22,11 @@ import com.example.indradev_resto.viewmodel.TableViewModel
 @Composable
 fun AdminDashboardScreen(onLogout: () -> Unit = {}) {
 
-    val tablerepository = TableModelRepositoryImpl()
-    val tableViewModel = TableViewModel(tablerepository)
+    val tableRepository = remember {
+        val databaseRef = FirebaseDatabase.getInstance().reference.child("tables")
+        TableModelRepositoryImpl(databaseRef)
+    }
+    val tableViewModel = TableViewModel(tableRepository)
     var selectedItem by remember { mutableStateOf(AdminBottomNavItem.HOME) }
 
     Scaffold(

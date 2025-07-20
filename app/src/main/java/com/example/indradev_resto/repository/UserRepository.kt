@@ -41,8 +41,6 @@ interface UserRepository {
         callback: (Boolean, String) -> Unit
     )
 
-    fun getUserCount(callback: (Boolean, Int) -> Unit)
-
     fun deleteAccount(userId: String, callback: (Boolean, String) -> Unit)
 
     fun getAllUsers(callback: (Boolean, String, List<UserModel>) -> Unit)
@@ -53,5 +51,7 @@ interface UserRepository {
     fun getFileNameFromUri(context: Context, uri: Uri): String?
 
     fun updateProfileImage(user: UserModel, callback: (Boolean, String) -> Unit)
+
+    fun getUserCount(callback: (Boolean, Int) -> Unit)
 
 }

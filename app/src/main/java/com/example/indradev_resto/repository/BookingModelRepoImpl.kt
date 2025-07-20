@@ -1,16 +1,12 @@
-// BookingModelRepoImpl.kt
 package com.example.indradev_resto.repository
 
 import com.example.indradev_resto.model.BookingModel
-import com.example.indradev_resto.model.OrderModel
 import com.google.firebase.database.*
-
 import java.util.*
 
-class BookingModelRepoImpl : BookingModelRepo {
-
-    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-    private val ref: DatabaseReference = database.reference.child("bookings")
+class BookingModelRepoImpl(
+    private val ref: DatabaseReference = FirebaseDatabase.getInstance().reference.child("bookings")
+) : BookingModelRepo {
 
     override fun insertBooking(
         booking: BookingModel,
@@ -46,6 +42,7 @@ class BookingModelRepoImpl : BookingModelRepo {
             }
         })
     }
+
     override fun deleteBooking(
         bookingId: String,
         onResult: (Boolean, String) -> Unit
@@ -71,7 +68,4 @@ class BookingModelRepoImpl : BookingModelRepo {
             }
         })
     }
-
-
-
 }
